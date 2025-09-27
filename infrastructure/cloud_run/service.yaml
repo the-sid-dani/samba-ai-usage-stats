@@ -1,0 +1,109 @@
+# Cloud Run service configuration for AI Usage Analytics Pipeline
+# Use with: gcloud run services replace service.yaml
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ai-usage-analytics-pipeline
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/launch-stage: GA
+  labels:
+    environment: production
+    team: data-engineering
+    component: data-pipeline
+spec:
+  template:
+    metadata:
+      annotations:
+        # Performance optimizations
+        autoscaling.knative.dev/maxScale: "10"
+        autoscaling.knative.dev/minScale: "0"
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/cpu-throttling: "false"
+
+        # Security
+        run.googleapis.com/vpc-access-connector: ""
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+
+      labels:
+        environment: production
+        version: latest
+    spec:
+      # Service account for BigQuery and Secret Manager access
+      serviceAccountName: ai-usage-pipeline@PROJECT_ID.iam.gserviceaccount.com
+
+      # Container configuration
+      containerConcurrency: 10
+      timeoutSeconds: 3600 # 1 hour for data processing
+
+      containers:
+      - name: pipeline-container
+        image: gcr.io/PROJECT_ID/ai-usage-analytics-pipeline:latest
+
+        # Resource allocation
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+
+        # Environment variables
+        env:
+        - name: GOOGLE_CLOUD_PROJECT
+          value: PROJECT_ID
+        - name: ENVIRONMENT
+          value: production
+        - name: BIGQUERY_DATASET
+          value: ai_usage_analytics
+        - name: LOG_LEVEL
+          value: INFO
+        - name: DEBUG
+          value: "false"
+
+        # Secrets from Secret Manager
+        - name: CURSOR_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cursor-api-key
+              key: latest
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: anthropic-api-key
+              key: latest
+        - name: SHEETS_SERVICE_ACCOUNT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sheets-service-account-key
+              key: latest
+
+        # Health check configuration
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        # Container port
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+
+  traffic:
+  - percent: 100
+    latestRevision: true

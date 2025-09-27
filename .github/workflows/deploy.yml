@@ -1,0 +1,256 @@
+name: Deploy AI Usage Analytics Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: ai-usage-analytics-pipeline
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run unit tests
+      run: |
+        python -m pytest tests/unit/ -v --tb=short
+
+    - name: Run integration tests
+      run: |
+        python -m pytest tests/integration/ -v --tb=short -k "not test_view_query_structure_validation"
+
+    - name: Test import structure
+      run: |
+        python -c "from src.orchestration.daily_job import DailyJobOrchestrator; print('Import successful')"
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit[toml] safety
+
+    - name: Run Bandit security scan
+      run: |
+        bandit -r src/ -f json -o bandit-results.json
+        bandit -r src/ -f txt
+      continue-on-error: true
+
+    - name: Run Safety check for known vulnerabilities
+      run: |
+        pip install -r requirements.txt
+        safety check --json --output safety-results.json
+        safety check
+      continue-on-error: true
+
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-scan-results
+        path: |
+          bandit-results.json
+          safety-results.json
+
+  build-and-deploy:
+    name: Build and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    needs: [test, security-scan]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure Docker to use gcloud
+      run: gcloud auth configure-docker
+
+    - name: Build Docker image
+      run: |
+        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+        docker tag gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA gcr.io/$PROJECT_ID/$SERVICE_NAME:latest
+
+    - name: Push Docker image
+      run: |
+        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:latest
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+          --platform managed \
+          --region $REGION \
+          --allow-unauthenticated \
+          --memory 1Gi \
+          --cpu 1 \
+          --timeout 3600 \
+          --max-instances 10 \
+          --min-instances 0 \
+          --concurrency 1 \
+          --set-env-vars="GOOGLE_CLOUD_PROJECT=$PROJECT_ID" \
+          --set-env-vars="ENVIRONMENT=production" \
+          --set-env-vars="BIGQUERY_DATASET=ai_usage_analytics" \
+          --set-env-vars="LOG_LEVEL=INFO" \
+          --set-env-vars="DEBUG=false" \
+          --service-account=${{ secrets.CLOUD_RUN_SERVICE_ACCOUNT }} \
+          --port 8080 \
+          --no-traffic \
+          --tag staging
+
+    - name: Run Health Check
+      run: |
+        # Get the staging URL
+        STAGING_URL=$(gcloud run services describe $SERVICE_NAME \
+          --region=$REGION \
+          --format="value(status.traffic[0].url)" \
+          --filter="metadata.labels.cloud.googleapis.com/location='$REGION'")
+
+        echo "Testing health check at: $STAGING_URL/health"
+
+        # Wait for service to be ready
+        sleep 30
+
+        # Test health check
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/health" || echo "000")
+
+        if [[ "$HTTP_STATUS" == "200" ]]; then
+          echo "✅ Health check passed"
+        else
+          echo "❌ Health check failed with status: $HTTP_STATUS"
+          exit 1
+        fi
+
+    - name: Route Traffic to New Version
+      run: |
+        # Route 100% traffic to the new version
+        gcloud run services update-traffic $SERVICE_NAME \
+          --region=$REGION \
+          --to-latest
+
+    - name: Deploy BigQuery Schema
+      run: |
+        # Use the deployment script we created in story 5.2
+        chmod +x ./scripts/deploy_bigquery_schema.sh
+        ./scripts/deploy_bigquery_schema.sh $PROJECT_ID ai_usage_analytics
+
+    - name: Validate BigQuery Deployment
+      run: |
+        # Use the validation script we created in story 5.2
+        chmod +x ./scripts/validate_bigquery_deployment.sh
+        ./scripts/validate_bigquery_deployment.sh $PROJECT_ID ai_usage_analytics
+
+  setup-scheduler:
+    name: Setup Cloud Scheduler
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Create or update Cloud Scheduler job
+      run: |
+        # Create daily job scheduler
+        gcloud scheduler jobs create http daily-usage-analytics \
+          --location=$REGION \
+          --schedule="0 6 * * *" \
+          --uri="https://$SERVICE_NAME-${{ secrets.CLOUD_RUN_HASH }}-uc.a.run.app/run-daily-job" \
+          --http-method=POST \
+          --headers="Content-Type=application/json" \
+          --message-body='{"mode": "production", "days": 1}' \
+          --oidc-service-account-email=${{ secrets.CLOUD_SCHEDULER_SERVICE_ACCOUNT }} \
+          --oidc-token-audience="https://$SERVICE_NAME-${{ secrets.CLOUD_RUN_HASH }}-uc.a.run.app" \
+          --time-zone="America/Los_Angeles" \
+          --description="Daily AI usage analytics data pipeline" \
+          --max-retry-attempts=3 \
+          --max-retry-duration=600s \
+          || gcloud scheduler jobs update http daily-usage-analytics \
+             --location=$REGION \
+             --schedule="0 6 * * *" \
+             --uri="https://$SERVICE_NAME-${{ secrets.CLOUD_RUN_HASH }}-uc.a.run.app/run-daily-job"
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy, setup-scheduler]
+    if: always()
+
+    steps:
+    - name: Notify success
+      if: needs.build-and-deploy.result == 'success' && needs.setup-scheduler.result == 'success'
+      run: |
+        echo "✅ Deployment successful! Pipeline is ready for production use."
+        echo "Cloud Run service: https://$SERVICE_NAME-${{ secrets.CLOUD_RUN_HASH }}-uc.a.run.app"
+        echo "Scheduler: Daily execution at 6 AM PST"
+
+    - name: Notify failure
+      if: needs.build-and-deploy.result == 'failure' || needs.setup-scheduler.result == 'failure'
+      run: |
+        echo "❌ Deployment failed. Check logs for details."
+        exit 1

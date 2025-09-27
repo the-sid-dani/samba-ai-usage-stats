@@ -1,0 +1,50 @@
+schema: 1
+story: "2.2"
+story_title: "Fix Anthropic API Client for Real Data"
+gate: FAIL
+status_reason: "Critical security vulnerability - API key exposure in error messages must be fixed before production"
+reviewer: "Quinn (Test Architect)"
+updated: "2025-09-26T23:30:00Z"
+
+waiver: { active: false }
+
+top_issues:
+  - id: "SEC-001"
+    severity: high
+    finding: "API key exposure in error messages via response.text in AnthropicAPIError"
+    suggested_action: "Sanitize response.text to remove API key patterns before including in error messages"
+    suggested_owner: "dev"
+    refs: ["src/ingestion/anthropic_client.py:96-100"]
+
+quality_score: 80
+
+evidence:
+  tests_reviewed: 24
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: FAIL
+    notes: "CRITICAL: API key exposure in error messages via response.text - must sanitize sensitive data in error handling"
+  performance:
+    status: PASS
+    notes: "Intelligent date chunking, efficient pagination, proper retry logic, memory management"
+  reliability:
+    status: PASS
+    notes: "Sophisticated error handling, pagination support, robust date range management"
+  maintainability:
+    status: PASS
+    notes: "Clean architecture, excellent separation of concerns, comprehensive documentation"
+
+recommendations:
+  immediate:
+    - action: "Sanitize response.text in error messages to remove API key patterns"
+      refs: ["src/ingestion/anthropic_client.py:96-100"]
+    - action: "Add unit test to verify API keys are not leaked in error messages"
+      refs: ["tests/unit/test_anthropic_client.py"]
+  future:
+    - action: "Consider implementing centralized error sanitization utility"
+      refs: ["src/shared/"]

@@ -1,0 +1,9 @@
+api_key_name,email,description
+cursor-dev-key-1,john.doe@company.com,Development environment Cursor key
+anthropic-prod-key-2,jane.smith@company.com,Production Claude API key
+cursor-team-key-3,team-lead@company.com,Team shared Cursor key
+anthropic-test-key-4,developer@company.com,Testing Claude integration
+claude-code-key-5,sarah.jones@company.com,Claude Code IDE integration
+anthropic-personal-key-6,freelancer@company.com,Personal Claude API key
+cursor-staging-key-7,qa-team@company.com,Staging environment testing
+anthropic-backup-key-8,admin@company.com,Backup production key
