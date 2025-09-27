@@ -11,7 +11,7 @@ PROJECT_ID=${1:-"your-project-id"}
 SERVICE_ACCOUNT=${2:-"ai-usage-pipeline@${PROJECT_ID}.iam.gserviceaccount.com"}
 REGION="us-central1"
 SERVICE_NAME="ai-usage-analytics-pipeline"
-IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
+IMAGE_NAME="us-central1-docker.pkg.dev/${PROJECT_ID}/ai-usage-analytics/pipeline"
 
 # Colors for output
 RED='\033[0;31m'
