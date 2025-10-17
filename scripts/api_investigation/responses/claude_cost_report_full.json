@@ -1,0 +1,77 @@
+{
+  "data": [
+    {
+      "starting_at": "2025-09-17T00:00:00Z",
+      "ending_at": "2025-09-18T00:00:00Z",
+      "results": [
+        {
+          "currency": "USD",
+          "amount": "83391.52823",
+          "workspace_id": null,
+          "description": null,
+          "cost_type": null,
+          "context_window": null,
+          "model": null,
+          "service_tier": null,
+          "token_type": null
+        }
+      ]
+    },
+    {
+      "starting_at": "2025-09-18T00:00:00Z",
+      "ending_at": "2025-09-19T00:00:00Z",
+      "results": [
+        {
+          "currency": "USD",
+          "amount": "151452.0374",
+          "workspace_id": null,
+          "description": null,
+          "cost_type": null,
+          "context_window": null,
+          "model": null,
+          "service_tier": null,
+          "token_type": null
+        }
+      ]
+    },
+    {
+      "starting_at": "2025-09-19T00:00:00Z",
+      "ending_at": "2025-09-20T00:00:00Z",
+      "results": [
+        {
+          "currency": "USD",
+          "amount": "187515.353295",
+          "workspace_id": null,
+          "description": null,
+          "cost_type": null,
+          "context_window": null,
+          "model": null,
+          "service_tier": null,
+          "token_type": null
+        }
+      ]
+    },
+    {
+      "starting_at": "2025-09-20T00:00:00Z",
+      "ending_at": "2025-09-21T00:00:00Z",
+      "results": []
+    },
+    {
+      "starting_at": "2025-09-21T00:00:00Z",
+      "ending_at": "2025-09-22T00:00:00Z",
+      "results": []
+    },
+    {
+      "starting_at": "2025-09-22T00:00:00Z",
+      "ending_at": "2025-09-23T00:00:00Z",
+      "results": []
+    },
+    {
+      "starting_at": "2025-09-23T00:00:00Z",
+      "ending_at": "2025-09-24T00:00:00Z",
+      "results": []
+    }
+  ],
+  "has_more": true,
+  "next_page": "page_MjAyNS0wOS0yNFQwMDowMDowMFo="
+}
