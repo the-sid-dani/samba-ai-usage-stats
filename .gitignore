@@ -1,0 +1,90 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+test_env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.local
+.env.production
+!.env.example
+
+# Logs
+*.log
+logs/*.log
+
+# Temporary files and directories
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Database
+*.db
+*.sqlite3
+
+# Cache
+.cache/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/temp/
+data/cache/
+debug_output/
+
+# IMPORTANT: Prevent root directory clutter
+# Only these files are allowed in root:
+# - README.md, CLAUDE.md, requirements.txt, package.json
+# - Dockerfile, cloudbuild.yaml, .env files, .gitignore
+# Everything else must go in proper subdirectories!
+
+# Block common temporary file patterns that shouldn't be in root
+/test_*.py
+/debug_*.py
+/temp_*.py
+/sample_*.py
+/*.log
+/pipeline_*.py
+/run_*.py
+/get_*.py
+/load_*.py
+/query_*.py
+/analyze_*.py
+/map_*.py
+/show_*.py
+/fix_*.py
+/*.json

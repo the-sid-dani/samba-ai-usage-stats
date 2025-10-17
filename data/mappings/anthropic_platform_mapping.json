@@ -1,0 +1,127 @@
+{
+  "api_keys": {
+    "apikey_01Ap5QMqkPdxe7zmXYo2awnc": {
+      "platform": "claude_api",
+      "name": "ankita-api-key",
+      "workspace_id": null
+    },
+    "apikey_01Eb6TPyqUneJQqKBfv7Gti6": {
+      "platform": "claude_code",
+      "name": "claude_code_key_max.roycroft_jqix",
+      "workspace_id": "wrkspc_01WtfAtqQsV3zBDs9RYpNZdR"
+    },
+    "apikey_01KW3rQrZXSk4rJUgdpTPz8b": {
+      "platform": "claude_code",
+      "name": "claude_code_key_jonathan.becker_ufxs",
+      "workspace_id": "wrkspc_01WtfAtqQsV3zBDs9RYpNZdR"
+    },
+    "apikey_01J9JbaiunVv4t2C3wCVVmkV": {
+      "platform": "claude_code",
+      "name": "claude_code_key_sid.dani_hxto",
+      "workspace_id": "wrkspc_01WtfAtqQsV3zBDs9RYpNZdR"
+    },
+    "apikey_01LfiySwd5NpRRgseWXr5W9i": {
+      "platform": "claude_api",
+      "name": "gregory-dev-key",
+      "workspace_id": null
+    },
+    "apikey_01XjA66AfHTXiRo8fkjXVqaW": {
+      "platform": "claude_api",
+      "name": "krzysztof-dev-key",
+      "workspace_id": null
+    },
+    "apikey_017SmwraMotYYjsht9VFajRG": {
+      "platform": "claude_api",
+      "name": "tomas-dev-key",
+      "workspace_id": null
+    },
+    "apikey_0185pgTvAANXFat2hq9uX1m1": {
+      "platform": "claude_api",
+      "name": "jonathan-dev-key",
+      "workspace_id": null
+    },
+    "apikey_011q17TiWbsxkTCcFwJYQwXM": {
+      "platform": "claude_api",
+      "name": "marta-dev-key",
+      "workspace_id": null
+    },
+    "apikey_0196GUjV92m49akEWNQUPjnB": {
+      "platform": "claude_api",
+      "name": "qing-claude",
+      "workspace_id": null
+    },
+    "apikey_011rkpBvK1xyAn4T5LK42Z67": {
+      "platform": "claude_api",
+      "name": "samba-onyx",
+      "workspace_id": null
+    },
+    "apikey_01HgEFLRFR1PnygxEwY8RiHv": {
+      "platform": "claude_api",
+      "name": "igor-obrepalski-dev-key",
+      "workspace_id": null
+    },
+    "apikey_01Wq4ULMjWUErhyZZtHdkq3C": {
+      "platform": "claude_api",
+      "name": "alexq-dev-key",
+      "workspace_id": null
+    },
+    "apikey_01SPkUZjWo2osSrwcyjRHZrL": {
+      "platform": "claude_api",
+      "name": "anson-dev-key",
+      "workspace_id": null
+    },
+    "apikey_01MqNbzh4DCAWAYMurXAtZ2c": {
+      "platform": "claude_code",
+      "name": "claude_code_key_agooch_ekiv",
+      "workspace_id": "wrkspc_01WtfAtqQsV3zBDs9RYpNZdR"
+    },
+    "apikey_01R6TJZ9mmU88nJcPbQFxprh": {
+      "platform": "claude_api",
+      "name": "rahul-dev-key",
+      "workspace_id": null
+    },
+    "apikey_01MJso8YnEUY7EtUDbvFuani": {
+      "platform": "claude_code",
+      "name": "claude_code_key_agooch_trfc",
+      "workspace_id": "wrkspc_01WtfAtqQsV3zBDs9RYpNZdR"
+    },
+    "apikey_015K9pdom1vczgv8FvE5gPiu": {
+      "platform": "claude_api",
+      "name": "antoni-grzymala-dev-key",
+      "workspace_id": null
+    },
+    "apikey_01N6aqkhmjnWAt2xWsd3GFtb": {
+      "platform": "claude_api",
+      "name": "lukasz-weglarczyk-dev-key",
+      "workspace_id": null
+    },
+    "apikey_01VSiGrEzDoGNkJqcGc5zBz1": {
+      "platform": "claude_api",
+      "name": "dominik-dev-key",
+      "workspace_id": null
+    }
+  },
+  "workspaces": {
+    "wrkspc_01WtfAtqQsV3zBDs9RYpNZdR": {
+      "platform": "claude_code",
+      "name": "Claude Code"
+    }
+  },
+  "platform_rules": {
+    "claude_code": [
+      "code",
+      "vscode",
+      "cursor"
+    ],
+    "claude_web": [
+      "web",
+      "claude.ai",
+      "browser"
+    ],
+    "claude_api": [
+      "api",
+      "direct",
+      "sdk"
+    ]
+  }
+}

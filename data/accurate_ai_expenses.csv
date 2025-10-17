@@ -1,0 +1,36 @@
+AI Platform Usage & Cost Report - ACCURATE
+Generated: 2025-09-30 11:09:39
+""
+Cost Category,Jun 2024,Jul 2024,Aug 2024,Sep 2024,Oct 2024,Nov 2024,Dec 2024,Jan 2025,Feb 2025,Mar 2025,Apr 2025,May 2025,Jun 2025,Jul 2025,Aug 2025,Sep 2025
+""
+FIXED COSTS (Subscriptions)
+Cursor Subscription,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00
+Claude.ai Subscription,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00
+Total Fixed,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00
+""
+VARIABLE COSTS (API Usage)
+Anthropic API (includes Cursor usage),0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,827.15,1089.33
+  - Direct Claude API usage,—,—,—,—,—,—,—,—,—,—,—,—,—,—,—,—
+  - Cursor API usage (via Anthropic),—,—,—,—,—,—,—,—,—,—,—,—,—,—,—,—
+Total Variable,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,827.15,1089.33
+""
+TOTALS
+Monthly Total,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,917.15,1179.33
+Cumulative,90.00,180.00,270.00,360.00,450.00,540.00,630.00,720.00,810.00,900.00,990.00,1080.00,1170.00,1260.00,2177.15,3356.48
+""
+COST ANALYSIS
+% Fixed,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,9.8%,7.6%
+% Variable,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,90.2%,92.4%
+""
+SUMMARY
+Total Fixed (16 months),"$1,440.00"
+Total Variable (API),"$1,916.48"
+GRAND TOTAL,"$3,356.48"
+Average Monthly API,$958.24
+""
+IMPORTANT NOTES:
+1. Cursor API usage is billed through Anthropic (not separate)
+2. Fixed costs: Cursor subscription ($50/mo) + Claude.ai subscription ($40/mo)
+3. Variable costs: All API usage (both direct and via Cursor) billed by Anthropic
+"4. Known invoice amounts: Aug 2025 = $827.15, Sep 2025 = $1089.33"
+5. Data retrieved: 2025-09-30 11:09

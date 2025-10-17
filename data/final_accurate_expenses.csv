@@ -1,0 +1,41 @@
+AI Platform Expense Report - ACCURATE BREAKDOWN,,,,,,,,,,,,,,,
+Generated: 2025-09-30,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Cost Category,Jun 2024,Jul 2024,Aug 2024,Sep 2024,Oct 2024,Nov 2024,Dec 2024,Jan 2025,Feb 2025,Mar 2025,Apr 2025,May 2025,Jun 2025,Jul 2025,Aug 2025,Sep 2025
+,,,,,,,,,,,,,,,
+SUBSCRIPTION COSTS (FIXED),,,,,,,,,,,,,,,
+Cursor Subscription (paid to Cursor),50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00
+Claude.ai Subscription (paid to Anthropic),40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00
+Total Fixed Subscriptions,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00
+,,,,,,,,,,,,,,,
+API USAGE COSTS (VARIABLE - ALL BILLED BY ANTHROPIC),,,,,,,,,,,,,,,
+"Total on Anthropic Invoice",0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,2694.31,827.15,1089.33
+"  - Cursor API usage (shown as 'Cursor Usage')",0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,[included],[included],1000.01
+"  - Direct Claude API usage",0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,[included],[included],89.32
+,,,,,,,,,,,,,,,
+CURSOR USAGE METRICS (from Cursor API),,,,,,,,,,,,,,,
+"Usage-based requests",0,0,0,0,0,0,0,0,0,0,0,0,11876,16377,9904,8333
+"Subscription requests",0,0,0,0,0,0,0,0,0,0,0,0,6048,8110,7546,6824
+,,,,,,,,,,,,,,,
+TOTAL MONTHLY COSTS,,,,,,,,,,,,,,,
+Grand Total (Fixed + Variable),90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,2784.31,917.15,1179.33
+,,,,,,,,,,,,,,,
+CUMULATIVE,,,,,,,,,,,,,,,
+Running Total,90.00,180.00,270.00,360.00,450.00,540.00,630.00,720.00,810.00,900.00,990.00,1080.00,1170.00,3954.31,4871.46,6050.79
+,,,,,,,,,,,,,,,
+COST ANALYSIS,,,,,,,,,,,,,,,
+"% Fixed",100%,100%,100%,100%,100%,100%,100%,100%,100%,100%,100%,100%,100%,3.2%,9.8%,7.6%
+"% Variable (API)",0%,0%,0%,0%,0%,0%,0%,0%,0%,0%,0%,0%,0%,96.8%,90.2%,92.4%
+,,,,,,,,,,,,,,,
+SUMMARY,,,,,,,,,,,,,,,
+Total Fixed (16 months):,"$1,440.00",,,,,,,,,,,,,,
+Total API (Anthropic invoices):,"$4,610.79",,,,,,,,,,,,,,
+GRAND TOTAL:,"$6,050.79",,,,,,,,,,,,,,
+Average Monthly (16 mo):,$378.17,,,,,,,,,,,,,,
+Average API (when active):,"$1,152.70",,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+IMPORTANT NOTES:,,,,,,,,,,,,,,,
+1. Cursor uses YOUR Anthropic API account for requests,,,,,,,,,,,,,,,
+2. Anthropic bills you directly for Cursor's API usage,,,,,,,,,,,,,,,
+3. The $50/month Cursor subscription is separate,,,,,,,,,,,,,,,
+4. All API costs appear on your Anthropic invoice,,,,,,,,,,,,,,,

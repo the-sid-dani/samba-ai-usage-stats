@@ -1,0 +1,41 @@
+AI Platform Monthly Expenses - Final Report,,,,,,,,,,,,,,,
+Generated: 2025-09-30,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+Cost Category,Jun 2024,Jul 2024,Aug 2024,Sep 2024,Oct 2024,Nov 2024,Dec 2024,Jan 2025,Feb 2025,Mar 2025,Apr 2025,May 2025,Jun 2025,Jul 2025,Aug 2025,Sep 2025
+,,,,,,,,,,,,,,,
+FIXED COSTS,,,,,,,,,,,,,,,
+Cursor Subscription,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00,50.00
+Claude.ai Subscription,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00,40.00
+Total Fixed Costs,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00,90.00
+,,,,,,,,,,,,,,,
+VARIABLE COSTS (API),,,,,,,,,,,,,,,
+Anthropic API Total,0.00,0.00,0.00,0.00,0.00,0.01,0.00,0.00,12.18,21.54,68.16,76.88,426.31,2694.31,827.15,1089.33
+"(includes all Claude API usage: direct, via Cursor, via Claude.ai)",,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+TOTAL MONTHLY COSTS,,,,,,,,,,,,,,,
+Grand Total,90.00,90.00,90.00,90.00,90.00,90.01,90.00,90.00,102.18,111.54,158.16,166.88,516.31,2784.31,917.15,1179.33
+,,,,,,,,,,,,,,,
+CUMULATIVE,,,,,,,,,,,,,,,
+Year-to-Date,90.00,180.00,270.00,360.00,450.00,540.01,630.01,720.01,822.19,933.73,1091.89,1258.77,1775.08,4559.39,5476.54,6655.87
+,,,,,,,,,,,,,,,
+COST BREAKDOWN,,,,,,,,,,,,,,,
+% Fixed,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,100.0%,88.1%,80.7%,56.9%,53.9%,17.4%,3.2%,9.8%,7.6%
+% Variable,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,0.0%,11.9%,19.3%,43.1%,46.1%,82.6%,96.8%,90.2%,92.4%
+,,,,,,,,,,,,,,,
+SUMMARY,,,,,,,,,,,,,,,
+Total Fixed Costs (16 months):,"$1,440.00",,,,,,,,,,,,,,
+Total Variable Costs (API):,"$5,215.87",,,,,,,,,,,,,,
+GRAND TOTAL (16 months):,"$6,655.87",,,,,,,,,,,,,,
+Average Monthly Total:,$415.99,,,,,,,,,,,,,,
+Average Monthly API (where used):,$521.59,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+KEY INSIGHTS:,,,,,,,,,,,,,,,
+1. Cursor's API usage is billed through Anthropic (not separately),,,,,,,,,,,,,,,
+2. Significant cost increase starting July 2025 ($2694.31),,,,,,,,,,,,,,,
+3. API costs now represent 90%+ of total monthly expenses,,,,,,,,,,,,,,,
+4. Total 16-month cost: $6655.87 vs $1440 fixed costs only,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+DATA SOURCES:,,,,,,,,,,,,,,,
+- Fixed costs: Cursor ($50/mo) + Claude.ai ($40/mo) subscriptions,,,,,,,,,,,,,,,
+- Variable costs: Anthropic invoices and API data,,,,,,,,,,,,,,,
+"- Known invoices: Jul=$2694.31, Aug=$827.15, Sep=$1089.33",,,,,,,,,,,,,,,
