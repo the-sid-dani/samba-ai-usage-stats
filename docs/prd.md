@@ -1,34 +1,53 @@
 # AI Usage Analytics Dashboard Product Requirements Document (PRD)
 
-**Project ID:** 03e62de8-5be5-4f58-a835-725ed7f7cab8
-**Document Version:** 1.0
-**Created:** September 26, 2025
+**Project ID:** samba-ai-usage-stats
+**Document Version:** 2.0
+**Created:** October 17, 2025
 **Author:** John (PM)
 **Status:** Draft
+**Previous Version:** v1.0 (archived - deprecated Looker/4-platform approach)
 
 ---
 
 ## Goals and Background Context
 
 ### Goals
-- **Financial Visibility:** Unified dashboard providing 100% AI spending visibility across Claude.ai, Claude Code, Claude API, and Cursor platforms
-- **Cost Optimization:** Enable identification of 15-20% cost savings opportunities within 1 quarter through data-driven insights
-- **Operational Efficiency:** Reduce manual reporting effort by 80% through automated daily data ingestion and dashboard generation
-- **ROI Tracking:** Provide clear metrics on AI tool usage efficiency and productivity gains across team members
-- **Budget Planning:** Support quarterly budget forecasting with accurate historical usage and cost trends
+
+- **Unified Cost Visibility:** Provide 100% spending visibility across Claude ecosystem (claude.ai, Claude Code, Claude API) and Cursor platform through consolidated BigQuery data warehouse and Metabase dashboards
+- **Platform-Specific Analytics:** Enable distinct analysis of chat-based AI usage (claude.ai) vs developer productivity tools (Claude Code, Cursor) with separate usage and cost tracking
+- **Cost Optimization:** Identify 15-20% cost savings opportunities within 1 quarter through data-driven insights into usage patterns and platform efficiency
+- **Operational Efficiency:** Reduce manual reporting effort by 80% through automated data ingestion from APIs and manual upload workflows
+- **ROI Tracking:** Measure AI tool productivity gains with metrics including acceptance rates, lines of code, and cost-per-productivity calculations
 
 ### Background Context
 
-Our organization currently spends $7k+ monthly across 4 different AI platforms (Claude.ai, Claude Code, Claude API, and Cursor) with 30-40 API keys distributed among ~15 team members. The finance team (Jaya) lacks consolidated visibility into this spending, resulting in manual effort for quarterly reviews and missed optimization opportunities.
+Our organization uses multiple AI platforms across different use cases:
+- **Claude.ai:** Chat-based knowledge work and research (~$2-3k/month)
+- **Claude Code:** IDE-integrated coding assistance (~$2-3k/month)
+- **Claude API:** Programmatic API usage for automation (~$1-2k/month)
+- **Cursor:** AI-powered IDE for development (~$2-3k/month)
 
-This PRD addresses the critical need for a unified analytics dashboard that automates data collection from vendor APIs, stores information in a BigQuery data warehouse, and presents finance-focused KPIs through Looker dashboards. The solution will provide single source of truth for AI usage patterns, cost allocation by user/team, and ROI metrics essential for strategic decision-making.
+**Total Monthly Spend:** $7-10k across ~15 team members
+
+**Current Pain Points:**
+- No unified view of AI spending across platforms
+- Manual effort required for cost allocation and reporting
+- Inability to compare platform efficiency (cost per productivity)
+- No automation for daily data collection and analysis
+- Finance team (Jaya) lacks visibility for budget planning
+
+This PRD defines a simplified 3-platform analytics system (removing Gemini from scope) that:
+1. Automates data collection from APIs where available
+2. Provides manual upload workflow for claude.ai (no programmatic API)
+3. Stores all data in BigQuery with 6 focused tables
+4. Delivers insights through self-hosted Metabase dashboards
 
 ### Change Log
+
 | Date | Version | Description | Author |
 |------|---------|-------------|--------|
-| September 26, 2025 | 1.0 | Initial PRD creation from Project Brief | John (PM) |
-| September 27, 2025 | 1.1 | Added Epic 5 deployment execution requirements and stories | John (PM) |
-| September 27, 2025 | 1.2 | Updated for Metabase transition replacing Looker Studio | John (PM) |
+| September 26, 2025 | 1.0 | Initial PRD with 4 platforms + Looker | John (PM) |
+| October 17, 2025 | 2.0 | Simplified to 3 platforms, 6 tables, Metabase focus, manual claude.ai upload | John (PM) |
 
 ---
 
@@ -36,235 +55,535 @@ This PRD addresses the critical need for a unified analytics dashboard that auto
 
 ### Functional Requirements
 
-**FR1:** The system shall automatically ingest daily usage data from Anthropic Claude API (covering Claude API, Claude Code, and Claude.ai usage) and Cursor Admin API via their respective admin endpoints
+**FR1: Claude.ai Usage Data Collection**
+The system shall provide a Google Sheets template for manual upload of claude.ai chat usage logs with automated BigQuery sync to `claude_usage_stats` table.
 
-**FR2:** The system shall store raw usage data in BigQuery with partitioned tables supporting 2+ years of historical retention
+**FR2: Claude Code Usage Data Collection**
+The system shall automatically fetch Claude Code IDE usage metrics from Claude Admin API `/claude_code` endpoint and store in `claude_code_usage_stats` table with daily refresh.
 
-**FR3:** The system shall map API keys to user emails through Google Sheets integration for accurate cost allocation
+**FR3: Cursor Usage Data Collection**
+The system shall automatically fetch Cursor IDE productivity metrics from Cursor Admin API `/teams/daily-usage-data` endpoint and store in `cursor_usage_stats` table with daily refresh.
 
-**FR4:** The system shall generate normalized usage and cost fact tables in BigQuery for reporting and analytics
+**FR4: Claude Cost Data Collection**
+The system shall fetch combined Claude expenses (claude.ai + Claude Code + API) from Claude Admin API Cost Report endpoint and store in `claude_expenses` table with platform field for segmentation.
 
-**FR5:** The system shall provide Metabase dashboards displaying monthly cost breakdowns by platform, user, and usage type through self-hosted deployment on GCP Compute Engine
+**FR5: Cursor Cost Data Collection**
+The system shall fetch Cursor subscription and overage costs from Cursor Admin API and store in `cursor_expenses` table with cost type breakdown (subscription vs usage-based).
 
-**FR6:** The system shall calculate and display key productivity metrics including lines of code added/accepted, acceptance rates, and session counts
+**FR6: API Usage Cost Tracking**
+The system shall filter Claude API programmatic usage costs from Claude Admin API Cost Report and store in `api_usage_expenses` table separate from platform costs.
 
-**FR7:** The system shall implement automated data validation checks to ensure accuracy against vendor invoices
+**FR7: BigQuery Data Warehouse**
+The system shall maintain 6 BigQuery tables with partitioning, 2+ years retention, and proper schema design supporting analytics queries.
 
-**FR8:** The system shall provide email alerts when monthly costs increase by >20% compared to previous month
+**FR8: Metabase Dashboard Suite**
+The system shall provide 4 core dashboards through self-hosted Metabase: Executive Summary, Cost Allocation, Productivity Analytics, and Platform ROI Analysis.
 
-**FR9:** The system shall be deployable to Google Cloud Platform using Infrastructure as Code (Terraform) with automated provisioning of all required resources including BigQuery dataset, Cloud Run service, Secret Manager secrets, and IAM roles
+**FR9: Automated Data Pipeline**
+The system shall run daily automated data ingestion at 6 AM PT for API-based sources (Claude Code, Cursor, expenses) with retry logic and error handling.
 
-**FR10:** The system shall provide automated BigQuery table and view deployment scripts that create all fact tables, dimension tables, and analytics views in the target environment
+**FR10: Data Quality Validation**
+The system shall implement validation checks ensuring data completeness, schema compliance, and cost reconciliation against vendor invoices.
 
-**FR11:** The system shall run autonomously in production with Cloud Scheduler triggering daily data ingestion at 6 AM PT without manual intervention
+**FR11: Export Capabilities**
+The system shall support dashboard data export in CSV, XLSX, JSON, and PNG formats through Metabase native functionality.
 
-**FR12:** The system shall provide production health monitoring through Cloud Run health checks and comprehensive logging for operational visibility
-
-**FR13:** The system shall deploy Metabase dashboards on self-hosted GCP Compute Engine VM using Docker containerization with PostgreSQL metadata storage
-
-**FR14:** The system shall provide all 6 dashboard types through Metabase interface: Finance Executive Dashboard, Cost Allocation Workbench, Engineering Productivity Analytics, Platform ROI Analysis, System Administration Panel, and Compliance & Security View
-
-**FR15:** The system shall maintain existing BigQuery data source connectivity through Metabase BigQuery driver with service account authentication
-
-**FR16:** The system shall provide programmatic dashboard management through Metabase REST API enabling dashboard-as-code deployment and configuration
-
-**FR17:** The system shall support all existing export capabilities (CSV, XLSX, JSON, PNG) through Metabase native export functionality
+**FR12: Alert System**
+The system shall send email alerts when monthly costs increase >20% or when data ingestion failures occur.
 
 ### Non-Functional Requirements
 
-**NFR1:** The system shall maintain 99.5% uptime for daily data ingestion jobs with automatic retry mechanisms
+**NFR1: Reliability**
+The system shall maintain 99.5% uptime for automated data ingestion with exponential backoff retry mechanisms.
 
-**NFR2:** The system shall complete daily data processing within 2 hours of scheduled execution at 6 AM PT
+**NFR2: Performance**
+Dashboard queries shall complete within 5 seconds using BigQuery optimizations and Metabase caching.
 
-**NFR3:** All API keys and credentials shall be stored securely in Google Secret Manager with audit logging enabled
+**NFR3: Security**
+All API keys shall be stored in Google Secret Manager with audit logging enabled and quarterly rotation procedures.
 
-**NFR4:** The system shall implement exponential backoff for API rate limit handling with maximum 3 retry attempts
+**NFR4: Scalability**
+The system shall support 100+ users and 50+ API keys without architectural changes.
 
-**NFR5:** Data processing shall scale to support 100+ users and 50+ API keys without architecture changes
+**NFR5: Data Privacy**
+All data shall remain within Google Cloud Platform US region with encryption at rest and in transit.
 
-**NFR6:** All data transformations shall be logged with structured JSON format for debugging and monitoring
+**NFR6: Deployment**
+Metabase shall deploy on GCP Compute Engine e2-medium VM (~$25/month) with automated backup and recovery.
 
-**NFR7:** BigQuery dataset shall use US region with Google-managed encryption for data at rest
+**NFR7: Maintainability**
+All infrastructure shall be defined as code (Terraform) with comprehensive documentation for operational handoff.
 
-**NFR8:** The system shall provide health check endpoints for monitoring job success/failure status
+---
 
-**NFR9:** The deployment process shall complete infrastructure provisioning within 15 minutes using Terraform automation with proper state management and rollback capabilities
+## Data Architecture
 
-**NFR10:** The CI/CD pipeline shall automatically deploy code changes to production within 10 minutes of successful testing with zero-downtime deployment strategy
+### BigQuery Tables (6 Tables)
 
-**NFR11:** The BigQuery table and view deployment shall handle schema migrations gracefully without data loss and support rollback to previous schema versions
+#### 1. `claude_usage_stats`
+**Purpose:** Claude.ai chat/web interface usage
+**Data Source:** Manual upload to Google Sheets → BigQuery sync
+**Key Fields:**
+- `user_email` - User attribution
+- `activity_date` - Date of usage
+- `conversation_count` - Number of conversations
+- `message_count` - Number of messages sent
+- `project_count` - Number of projects created
+- `file_upload_count` - Files uploaded to conversations
+- `upload_timestamp` - When data was uploaded (for freshness tracking)
 
-**NFR12:** All deployment processes shall include comprehensive validation steps ensuring >99% deployment success rate with automatic rollback on failure
+**Update Frequency:** Manual (weekly or monthly)
 
-**NFR13:** The production environment shall be fully reproducible from Infrastructure as Code with no manual configuration steps required
+#### 2. `claude_code_usage_stats`
+**Purpose:** Claude Code IDE productivity metrics
+**Data Source:** Claude Admin API `/claude_code` endpoint
+**Key Fields:**
+- `user_email` - Direct email attribution
+- `activity_date` - Date of usage
+- `num_sessions` - IDE sessions
+- `commits_by_claude_code` - Git commits with AI
+- `pull_requests_by_claude_code` - PRs created with AI
+- `lines_added` - Lines added with AI assistance
+- `lines_removed` - Lines removed with AI assistance
+- `edit_tool_accepted` - File edits accepted
+- `edit_tool_rejected` - File edits rejected
+- `model` - AI model used
+- `estimated_cost_usd` - Usage-based cost
+- `input_tokens`, `output_tokens`, `cache_tokens` - Token usage
 
-**NFR14:** The Metabase VM shall maintain 99.5% uptime with automated backup and monitoring on GCP Compute Engine e2-medium instance (~$25/month)
+**Update Frequency:** Daily automated
 
-**NFR15:** Dashboard queries shall complete within 5 seconds leveraging existing BigQuery view optimizations and VM resource allocation
+#### 3. `cursor_usage_stats`
+**Purpose:** Cursor IDE productivity and interaction metrics
+**Data Source:** Cursor Admin API `/teams/daily-usage-data`
+**Key Fields:**
+- `user_email` - Direct email attribution
+- `activity_date` - Date of usage
+- `is_active` - User activity flag
+- `total_lines_added` - Lines suggested by AI
+- `accepted_lines_added` - Lines accepted by developer
+- `total_applies` - AI suggestions applied
+- `total_accepts` - AI suggestions accepted
+- `total_rejects` - AI suggestions rejected
+- `composer_requests` - Long-form code generation
+- `chat_requests` - Q&A interactions
+- `agent_requests` - Autonomous code changes
+- `cmdk_usages` - Inline edit requests
+- `subscription_included_reqs` - Within subscription (≤500)
+- `usage_based_reqs` - Overage requests
+- `most_used_model` - Primary AI model
+- `client_version` - Cursor version
 
-**NFR16:** Metabase deployment shall be fully automated using Docker Compose with one-command setup and configuration
+**Update Frequency:** Daily automated
 
-**NFR17:** The VM infrastructure shall be reproducible using Infrastructure as Code with automated PostgreSQL setup and Metabase configuration
+#### 4. `claude_expenses`
+**Purpose:** All Claude platform costs (claude.ai + Claude Code + API combined)
+**Data Source:** Claude Admin API Cost Report
+**Key Fields:**
+- `expense_date` - Date of cost
+- `platform` - "claude.ai" | "claude_code" | "claude_api"
+- `workspace_id` - Workspace attribution
+- `model` - AI model driving cost
+- `cost_usd` - Cost in USD
+- `cost_type` - "tokens" | "subscription" | "other"
+- `token_type` - "input" | "output" | "cache_read" (if applicable)
+- `service_tier` - Service level
+
+**Update Frequency:** Daily automated
+
+**Platform Segmentation Logic:**
+- Use `workspace_id` or API endpoint patterns to distinguish claude.ai vs Claude Code vs API usage
+- Aggregate by platform for dashboard filtering
+
+#### 5. `cursor_expenses`
+**Purpose:** Cursor subscription and overage costs
+**Data Source:** Cursor Admin API `/teams/daily-usage-data` (cost fields)
+**Key Fields:**
+- `expense_date` - Date of cost
+- `user_email` - User attribution
+- `cost_type` - "subscription" | "usage_based" | "api_key"
+- `subscription_included_reqs` - Requests within plan
+- `usage_based_reqs` - Overage requests
+- `estimated_cost_usd` - Total cost
+- `subscription_plan` - Plan type
+
+**Update Frequency:** Daily automated
+
+**Cost Calculation:**
+```
+total_cost = (subscription_base / days_in_month) + (usage_based_reqs × overage_rate)
+```
+
+#### 6. `api_usage_expenses`
+**Purpose:** Claude API programmatic usage costs ONLY (not Cursor API)
+**Data Source:** Claude Admin API Cost Report (filtered)
+**Key Fields:**
+- `expense_date` - Date of cost
+- `api_key_id` - API key attribution
+- `model` - AI model used
+- `cost_usd` - Cost in USD
+- `input_tokens` - Input token count
+- `output_tokens` - Output token count
+- `cache_tokens` - Cache token usage
+- `endpoint` - API endpoint used (messages, batch, etc.)
+- `service_tier` - Service level
+
+**Update Frequency:** Daily automated
+
+**Filtering Logic:**
+- Include ONLY programmatic API usage (Messages API, Batch API, Tools API)
+- Exclude Claude Code and claude.ai costs (those go in `claude_expenses`)
+- Use API key patterns or workspace IDs to filter
+
+### Data Flow Architecture
+
+```
+┌─────────────────────┐
+│  Data Sources       │
+├─────────────────────┤
+│ 1. Google Sheets    │──► Manual Upload ──────► claude_usage_stats
+│ 2. Claude Admin API │──► /claude_code ────────► claude_code_usage_stats
+│    (3 endpoints)    │──► Cost Report ─────────► claude_expenses
+│                     │──► Cost Report (filter)─► api_usage_expenses
+│ 3. Cursor Admin API │──► /daily-usage-data ───► cursor_usage_stats
+│                     │──► /daily-usage-data ───► cursor_expenses
+└─────────────────────┘
+         │
+         ▼
+┌─────────────────────┐
+│  BigQuery Tables    │
+│  (6 tables)         │
+└─────────────────────┘
+         │
+         ▼
+┌─────────────────────┐
+│  Metabase           │
+│  (4 dashboards)     │
+└─────────────────────┘
+```
+
+### API Key Mapping Strategy
+
+**Challenge:** Claude API Cost Report returns `api_key_id`, not email
+**Solution:** Maintain mapping table in Google Sheets:
+- `api_key_id` → `user_email`
+- `api_key_id` → `team_name`
+- Manual maintenance by admin
+
+**Table:** `dim_api_key_mapping` (BigQuery)
+- Synced from Google Sheets
+- Used for JOIN with `api_usage_expenses` and `claude_expenses`
 
 ---
 
 ## User Interface Design Goals
 
-### Overall UX Vision
-Clean, finance-focused dashboard emphasizing cost visibility and trend analysis. Primary users are finance professionals who need quick access to spending summaries, cost allocation by user/team, and month-over-month comparisons. Interface should minimize cognitive load while providing drill-down capabilities for detailed analysis.
+### Dashboard Strategy
 
-### Key Interaction Paradigms
-- **Role-based Navigation:** Different menu structures for Finance vs Engineering vs Admin users
-- **Contextual Help:** Embedded tooltips and metric definitions for non-technical finance users
-- **Progressive Disclosure:** Summary cards that expand to detailed breakdowns on click
-- **Cross-Dashboard Linking:** Ability to jump from cost anomaly to productivity details for root cause analysis
+**Platform:** Self-hosted Metabase on GCP Compute Engine
+**Architecture:** See `/docs/api-reference/metabase-architecture.md`
+**Cost:** ~$25/month VM + $0 licensing
 
-### Core Screens and Views
-1. **Finance Executive Dashboard** - High-level spend summary with budget variance alerts
-2. **Cost Allocation Workbench** - Detailed user/team/project cost breakdowns with export tools
-3. **Engineering Productivity Analytics** - Developer efficiency metrics and team comparisons
-4. **Platform ROI Analysis** - Cost-per-productivity calculations across all AI tools
-5. **System Administration Panel** - Data quality monitoring and manual controls (admin-only)
-6. **Compliance & Security View** - Access auditing and API key management (security-only)
+### Core Dashboards (4 Required)
 
-### Accessibility: WCAG AA
-- **Keyboard Navigation:** Full dashboard navigation without mouse for accessibility compliance
-- **Screen Reader Support:** Proper ARIA labels for all charts and data tables
-- **Color Blind Friendly:** Blue/orange color scheme instead of red/green for status indicators
-- **High Contrast Mode:** Optional high contrast theme for visually impaired users
+#### 1. Executive Summary Dashboard
+**Target Users:** Finance Team, C-Suite
+**Data Sources:** All expense tables aggregated
+**Key Metrics:**
+- Total monthly AI spend across all platforms
+- Month-over-month growth rate
+- Platform cost distribution (pie chart)
+- Top 5 users by spend
+- Budget vs actual variance
 
-### Branding
-Corporate-standard Metabase styling with clear, professional aesthetic focused on data readability rather than visual flourishes, utilizing Metabase theming capabilities for consistent branding.
+**Visualizations:**
+- KPI cards (total spend, growth %)
+- Line chart (monthly trends)
+- Pie chart (platform distribution)
+- Bar chart (user ranking)
 
-### Target Device and Platforms: Web Responsive
-Primary usage on desktop/laptop for detailed analysis, with responsive design supporting tablet access for executive summary views.
+#### 2. Cost Allocation Workbench
+**Target Users:** Finance Team, Department Heads
+**Data Sources:** All expense tables + user mapping
+**Key Metrics:**
+- User-level cost breakdown
+- Team/department aggregations
+- Platform-by-user spend matrix
+- Cost per productivity ratios
+
+**Visualizations:**
+- Detailed cost tables (sortable, filterable)
+- Heatmap (user × platform spending)
+- Export-friendly format for budget reviews
+
+#### 3. Productivity Analytics Dashboard
+**Target Users:** Engineering Managers, Team Leads
+**Data Sources:** `claude_code_usage_stats`, `cursor_usage_stats`
+**Key Metrics:**
+- Lines of code accepted (acceptance rate)
+- Commits and PRs generated with AI
+- Developer efficiency rankings
+- Tool effectiveness comparison (Claude Code vs Cursor)
+
+**Visualizations:**
+- Acceptance rate trends (line chart)
+- Productivity heatmap (team performance)
+- Tool comparison (side-by-side metrics)
+
+#### 4. Platform ROI Analysis
+**Target Users:** Technical Architects, Finance
+**Data Sources:** All tables (usage + expenses)
+**Key Metrics:**
+- Cost per line of code
+- Cost per accepted suggestion
+- Platform efficiency scores
+- ROI by user and platform
+
+**Visualizations:**
+- Scatter plots (cost vs productivity)
+- ROI trend lines
+- Efficiency comparison charts
+- Platform recommendation insights
+
+### Accessibility & Usability
+
+- **WCAG AA Compliance:** Full keyboard navigation, screen reader support
+- **Color Scheme:** Color-blind friendly (blue/orange, not red/green)
+- **Responsive Design:** Desktop-optimized with tablet support
+- **Export Options:** CSV, XLSX, JSON, PNG for all dashboards
 
 ---
 
 ## Technical Assumptions
 
-### Repository Structure: Monorepo
-Single repository containing all components: Python ingestion scripts, BigQuery schema definitions, Looker dashboard configurations, and documentation. This approach simplifies dependency management and deployment coordination for the relatively small codebase.
+### Infrastructure
 
-### Service Architecture
-**Serverless Microservices within Monorepo:** Cloud Run containerized jobs for each data source (Anthropic Claude API, Cursor API) with shared BigQuery client and utilities. This provides scalability and fault isolation while maintaining operational simplicity for daily batch processing.
+**Google Cloud Platform:**
+- **Project:** `ai-workflows-459123` (existing)
+- **BigQuery Dataset:** `ai_usage_analytics` (US region)
+- **Compute Engine:** e2-medium VM for Metabase (~$25/month)
+- **Secret Manager:** API key storage with quarterly rotation
+- **Cloud Scheduler:** Daily trigger at 6 AM PT
 
-### Testing Requirements
-**Unit + Integration Testing:**
-- Unit tests for API clients with mocking (pytest framework)
-- Integration tests with BigQuery sandbox for data pipeline validation
-- Data quality validation checks with schema drift detection
-- Load testing simulating 30-day historical backfill scenarios
+**Python Runtime:**
+- **Version:** Python 3.11+
+- **Key Libraries:** `google-cloud-bigquery`, `requests`, `pandas`
+- **Container:** Docker with multi-stage builds
 
-### Additional Technical Assumptions and Requests
+### Data Sources & APIs
 
-**Infrastructure & Deployment:**
-- **Google Cloud Platform:** Existing project ai-workflows-459123 with BigQuery, Cloud Run, Secret Manager
-- **Python 3.11:** Runtime environment with google-cloud libraries and requests
-- **Container Strategy:** Multi-stage Docker builds optimized for Cloud Run cold starts
-- **Scheduling:** Google Cloud Scheduler triggering daily jobs at 6 AM PT
+**1. Claude Admin API** (documented in `/docs/api-reference/`)
+- **Endpoint 1:** `/v1/organizations/usage_report/claude_code` → claude_code_usage_stats
+- **Endpoint 2:** `/v1/organizations/cost_report` → claude_expenses, api_usage_expenses
+- **Authentication:** Admin API key (x-api-key header)
+- **Rate Limits:** Standard Anthropic limits with backoff
 
-**Data Architecture:**
-- **BigQuery Dataset:** US region with partitioned tables for cost optimization
-- **Data Retention:** 2+ years for historical trend analysis and compliance
-- **Identity Resolution:** Google Sheets as manual mapping source for API key attribution
-- **Data Quality:** Automated validation against vendor invoice reconciliation
+**2. Cursor Admin API** (documented in `/docs/api-reference/cursor-api-specs.md`)
+- **Endpoint:** `/teams/daily-usage-data` → cursor_usage_stats, cursor_expenses
+- **Authentication:** Basic auth (API key as username)
+- **Rate Limits:** 90-day max date range per request
 
-**Security & Compliance:**
-- **Secret Management:** Google Secret Manager for API keys with quarterly rotation
-- **Access Controls:** IAM with principle of least privilege for service accounts
-- **Audit Logging:** Structured JSON logging to Cloud Logging for all operations
-- **Data Encryption:** Google-managed keys at rest, TLS 1.2+ in transit
+**3. Google Sheets**
+- **Purpose:** Manual upload for claude.ai usage, API key mapping
+- **Sync Method:** BigQuery Sheets connector or manual CSV import
+- **Update Frequency:** Weekly/monthly manual updates
 
-**Monitoring & Operations:**
-- **Health Checks:** /health endpoints for Cloud Run services
-- **Error Handling:** Exponential backoff with circuit breaker patterns
-- **Alerting:** Cost anomaly detection and data staleness monitoring
-- **Performance:** 2-hour SLA for daily processing completion
+### Metabase Architecture
+
+**Reference:** `/docs/api-reference/metabase-architecture.md`
+
+**Deployment:**
+- GCP Compute Engine e2-medium VM
+- Docker Compose (Metabase + PostgreSQL)
+- BigQuery connection via service account
+- Automated backup to Cloud Storage
+
+**API Capabilities:**
+- Dashboard creation via REST API
+- Programmatic widget/card management
+- Scheduled reports and email delivery
+- Export in multiple formats
+
+### Data Quality & Validation
+
+**Validation Checks:**
+- Schema compliance (required fields present)
+- Data freshness (last updated < 48 hours)
+- Cost reconciliation (API totals match invoices ±5%)
+- Duplicate detection (deduplication on date + user)
+
+**Error Handling:**
+- Exponential backoff for API retries (3 attempts)
+- Circuit breaker pattern for repeated failures
+- Structured logging to Cloud Logging
+- Email alerts for data staleness >48 hours
+
+### Security & Compliance
+
+**API Key Management:**
+- Store in Google Secret Manager (never in code)
+- Rotate quarterly with documented procedure
+- Least privilege IAM for service accounts
+- Audit logging enabled for all access
+
+**Data Encryption:**
+- At rest: Google-managed keys
+- In transit: TLS 1.2+
+- Network: VPC with firewall rules for Metabase VM
 
 ---
 
 ## Epic List
 
-**Epic 1: Foundation & Cursor Integration**
-Establish project infrastructure, BigQuery data warehouse, and complete Cursor platform integration delivering first usable dashboard for engineering productivity metrics.
+### Epic 1: Foundation & Data Infrastructure
+**Goal:** Establish BigQuery data warehouse and manual upload workflows
+**Deliverables:**
+- Create 6 BigQuery tables with proper schema
+- Set up Google Sheets → BigQuery sync for claude.ai usage
+- Create API key mapping table and management process
+- Implement basic data validation checks
 
-**Epic 2: Anthropic Multi-Platform Integration**
-Add Anthropic Claude API integration covering Claude API, Claude Code, and Claude.ai usage data with unified user attribution and cost allocation capabilities.
+**Success Criteria:** Can manually upload claude.ai data and query in BigQuery
 
-**Epic 3: Advanced Analytics & Finance Dashboard**
-Implement comprehensive cost analysis, budget tracking, and finance-specific reporting with automated alerting for cost anomalies and variance detection.
+### Epic 2: Cursor Integration
+**Goal:** Automate Cursor data collection for usage and costs
+**Deliverables:**
+- Implement Cursor API client using documented specs
+- Build ETL pipeline: Cursor API → BigQuery (usage + expenses)
+- Add error handling and retry logic
+- Validate data accuracy against Cursor dashboard
 
-**Epic 4: Production Hardening & Monitoring**
-Deploy production-grade monitoring, data quality validation, security hardening, and operational documentation for long-term system reliability.
+**Success Criteria:** Daily automated Cursor data flowing to BigQuery with 99% accuracy
 
-**Epic 5: Infrastructure Provisioning & Deployment**
-Execute infrastructure provisioning, deploy all services to production, and validate end-to-end system integration with real data sources for business-ready operation.
+### Epic 3: Claude Platform Integration
+**Goal:** Automate Claude ecosystem data collection (Code + expenses + API)
+**Deliverables:**
+- Implement Claude Admin API client for `/claude_code` endpoint
+- Build cost report parser for claude_expenses (all platforms)
+- Filter API usage costs into api_usage_expenses
+- Implement platform segmentation logic
 
-**Epic 6: Metabase Dashboard Platform**
-Replace planned Looker Studio with free self-hosted Metabase on GCP Compute Engine, providing all 6 dashboard types with API-driven management capabilities while maintaining existing BigQuery data pipeline integrity.
+**Success Criteria:** All Claude data sources automated with correct platform attribution
 
-### Epic Rationale
-- **Epic 1** provides immediate value to engineering team while proving technical architecture
-- **Epic 2** adds the primary cost data sources needed by finance team
-- **Epic 3** delivers the core business value for cost optimization and budget planning
-- **Epic 4** ensures enterprise-grade reliability and maintainability
-- **Epic 5** bridges development to production, ensuring actual business value delivery
-- **Epic 6** provides cost-effective dashboard solution with superior API capabilities and zero licensing costs
+### Epic 4: Metabase Dashboard Suite
+**Goal:** Deploy self-hosted Metabase with 4 core dashboards
+**Deliverables:**
+- Provision GCP VM and deploy Metabase via Docker
+- Connect to BigQuery with service account
+- Build 4 dashboards: Executive, Cost Allocation, Productivity, ROI
+- Configure export capabilities and user access
 
-Each epic delivers deployable functionality that provides tangible value to users, with logical dependencies flowing from infrastructure to data sources to analytics to operations.
+**Success Criteria:** Finance team can independently access dashboards and export data
+
+### Epic 5: Production Hardening
+**Goal:** Ensure system reliability and operational readiness
+**Deliverables:**
+- Implement Cloud Scheduler for daily automation
+- Add comprehensive monitoring and alerting
+- Create runbook for common operations
+- Implement automated backup for Metabase VM
+- Document user guides and admin procedures
+
+**Success Criteria:** System runs autonomously for 30 days with >99% uptime
 
 ---
 
 ## Technical Implementation Approach
 
-### Phase 1: Prove Architecture
-- Start with Cursor integration only
-- Validate entire pipeline: API → BigQuery → Looker
-- Implement comprehensive error handling early
-- **Success Criteria:** End-to-end data flow working reliably
+### Phase 1: Prove Manual + Cursor (Weeks 1-2)
+**Focus:** Validate data flow with simplest path
+1. Create BigQuery schema for all 6 tables
+2. Set up Google Sheets → BigQuery sync (claude.ai usage)
+3. Implement Cursor API integration (usage + expenses)
+4. Build first Metabase dashboard (Cursor productivity)
 
-### Phase 2: Add Complexity
-- Integrate Anthropic APIs with extensive testing
-- Implement Google Sheets mapping with validation
-- Add basic monitoring and alerting
-- **Success Criteria:** Multi-platform cost attribution working
+**Success Gate:** End-to-end data flow for Cursor working
 
-### Phase 3: Polish & Harden
-- Build advanced Metabase dashboards
-- Implement automated data quality checks
-- Add production monitoring and recovery
-- **Success Criteria:** Finance team can use system independently
+### Phase 2: Claude Integration (Weeks 3-4)
+**Focus:** Add Claude ecosystem data sources
+1. Implement Claude Admin API client (claude_code endpoint)
+2. Build cost report parser with platform filtering
+3. Create API key mapping workflow
+4. Add remaining dashboards (Executive, Cost Allocation)
 
-### Phase 4: Infrastructure Execution
-- Execute Terraform infrastructure provisioning
-- Deploy BigQuery tables and views to production
-- Configure Secret Manager with API keys
-- Set up IAM roles and service accounts
-- **Success Criteria:** GCP infrastructure fully provisioned and accessible
+**Success Gate:** All 3 platforms flowing to BigQuery with correct attribution
 
-### Phase 5: Production Deployment & Integration
-- Build and deploy Docker container to Cloud Run
-- Configure Cloud Scheduler for daily automation
-- Execute end-to-end integration testing with real APIs
-- Validate data pipeline with production data
-- **Success Criteria:** System running autonomously in production with real data
+### Phase 3: Dashboard & UX (Weeks 5-6)
+**Focus:** Complete Metabase suite and polish
+1. Build all 4 core dashboards
+2. Configure export capabilities
+3. Implement user access controls
+4. Create user training documentation
+
+**Success Gate:** Finance team using dashboards independently
+
+### Phase 4: Automation & Hardening (Weeks 7-8)
+**Focus:** Production readiness
+1. Deploy Cloud Scheduler for daily runs
+2. Implement monitoring and alerting
+3. Add data quality validation
+4. Create operational runbook
+5. Perform 30-day reliability testing
+
+**Success Gate:** System achieves >99% uptime for 30 days
 
 ### Contingency Plans
-- **API Integration Issues:** Fall back to manual data upload initially
-- **Performance Problems:** Implement caching and query optimization
-- **Data Quality Issues:** Add manual validation checkpoints
-- **User Adoption Problems:** Provide training and support documentation
+
+**API Integration Issues:**
+- Fallback: Manual CSV upload for affected platform
+- Timeline impact: +1 week per platform
+- Mitigation: Parallel development of manual upload templates
+
+**Data Quality Problems:**
+- Fallback: Manual reconciliation process
+- Timeline impact: +2 weeks for automated validation
+- Mitigation: Start with manual validation, automate incrementally
+
+**Performance Issues:**
+- Fallback: Pre-aggregated summary tables
+- Timeline impact: +1 week for optimization
+- Mitigation: Design schema with performance in mind from start
+
+**User Adoption Challenges:**
+- Fallback: Increased training and documentation
+- Timeline impact: +1-2 weeks for change management
+- Mitigation: Involve finance team early in dashboard design
 
 ---
 
 ## Next Steps
 
-### UX Expert Prompt
-Review this PRD and create comprehensive UI/UX specifications for the multi-stakeholder dashboard system, focusing on role-based user experiences and finance team workflow optimization.
+### Architect Handoff
+Use this PRD to create technical architecture documentation covering:
+- BigQuery schema design with partitioning strategy
+- ETL pipeline architecture for each data source
+- Metabase deployment specification
+- API integration patterns and error handling
 
-### Architect Prompt
-Use this PRD to create detailed technical architecture documentation covering the serverless data pipeline, BigQuery schema design, and Cloud Run deployment specifications for the AI usage analytics system.
+Reference preserved documentation:
+- `/docs/api-reference/cursor-api-specs.md`
+- `/docs/api-reference/metabase-architecture.md`
+
+### Developer Handoff
+Break down epics into user stories focusing on:
+- Table creation and schema implementation
+- API client development with testing
+- Dashboard creation with Metabase API
+- Automation and monitoring setup
+
+### Success Metrics
+
+**30-Day Milestones:**
+- All 6 BigQuery tables populated with accurate data
+- 4 Metabase dashboards operational
+- Daily automation running reliably
+- Finance team using system for monthly reporting
+
+**90-Day Goals:**
+- 15% cost savings identified through analytics
+- 80% reduction in manual reporting effort
+- >99% system uptime achieved
+- Positive user feedback from finance and engineering teams
 
 ---
 
