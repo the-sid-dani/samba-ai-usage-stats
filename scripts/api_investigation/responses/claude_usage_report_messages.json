@@ -1,0 +1,95 @@
+{
+  "data": [
+    {
+      "starting_at": "2025-09-17T00:00:00Z",
+      "ending_at": "2025-09-18T00:00:00Z",
+      "results": [
+        {
+          "uncached_input_tokens": 56047359,
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 2777906
+          },
+          "cache_read_input_tokens": 51056717,
+          "output_tokens": 2724851,
+          "server_tool_use": {
+            "web_search_requests": 0
+          },
+          "api_key_id": null,
+          "workspace_id": null,
+          "model": null,
+          "service_tier": null,
+          "context_window": null
+        }
+      ]
+    },
+    {
+      "starting_at": "2025-09-18T00:00:00Z",
+      "ending_at": "2025-09-19T00:00:00Z",
+      "results": [
+        {
+          "uncached_input_tokens": 96786368,
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 10845999
+          },
+          "cache_read_input_tokens": 99518633,
+          "output_tokens": 4739852,
+          "server_tool_use": {
+            "web_search_requests": 8
+          },
+          "api_key_id": null,
+          "workspace_id": null,
+          "model": null,
+          "service_tier": null,
+          "context_window": null
+        }
+      ]
+    },
+    {
+      "starting_at": "2025-09-19T00:00:00Z",
+      "ending_at": "2025-09-20T00:00:00Z",
+      "results": [
+        {
+          "uncached_input_tokens": 118459752,
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 8121935
+          },
+          "cache_read_input_tokens": 100094909,
+          "output_tokens": 5430933,
+          "server_tool_use": {
+            "web_search_requests": 50
+          },
+          "api_key_id": null,
+          "workspace_id": null,
+          "model": null,
+          "service_tier": null,
+          "context_window": null
+        }
+      ]
+    },
+    {
+      "starting_at": "2025-09-20T00:00:00Z",
+      "ending_at": "2025-09-21T00:00:00Z",
+      "results": []
+    },
+    {
+      "starting_at": "2025-09-21T00:00:00Z",
+      "ending_at": "2025-09-22T00:00:00Z",
+      "results": []
+    },
+    {
+      "starting_at": "2025-09-22T00:00:00Z",
+      "ending_at": "2025-09-23T00:00:00Z",
+      "results": []
+    },
+    {
+      "starting_at": "2025-09-23T00:00:00Z",
+      "ending_at": "2025-09-24T00:00:00Z",
+      "results": []
+    }
+  ],
+  "has_more": true,
+  "next_page": "page_MjAyNS0wOS0yNFQwMDowMDowMFo="
+}

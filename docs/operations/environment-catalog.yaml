@@ -1,0 +1,59 @@
+# Canonical environment catalog for agents (machine-readable)
+project_id: ai-workflows-459123
+region: us-central1
+zone: us-central1-a
+
+datasets:
+  - name: ai_usage_analytics
+    region: US
+
+buckets:
+  backups: samba-metabase-backups
+
+artifact_registry:
+  repo: us-central1-docker.pkg.dev/ai-workflows-459123/ai-usage
+
+service_accounts:
+  deployer:
+    email: deployer-sa@ai-workflows-459123.iam.gserviceaccount.com
+    roles:
+      - roles/run.admin
+      - roles/iam.serviceAccountUser
+      - roles/cloudscheduler.admin
+      - roles/artifactregistry.writer
+      - roles/compute.admin
+      - roles/secretmanager.admin
+  pipeline_runtime:
+    email: ai-usage-pipeline@ai-workflows-459123.iam.gserviceaccount.com
+    roles:
+      - roles/bigquery.jobUser
+      - roles/secretmanager.secretAccessor
+  scheduler:
+    email: scheduler@ai-workflows-459123.iam.gserviceaccount.com
+    roles:
+      - roles/run.jobsExecutor
+      - roles/iam.serviceAccountTokenCreator
+  metabase_vm:
+    email: metabase-vm@ai-workflows-459123.iam.gserviceaccount.com
+    roles:
+      - roles/secretmanager.secretAccessor
+      - roles/storage.objectAdmin
+      - roles/logging.logWriter
+  metabase_bq_reader:
+    email: metabase-bq-reader@ai-workflows-459123.iam.gserviceaccount.com
+    roles:
+      - roles/bigquery.dataViewer
+
+secrets:
+  anthropic_api_key: anthropic-admin-api-key
+  cursor_api_key: cursor-api-key
+  metabase:
+    db_password: metabase-db-password
+    admin_email: metabase-admin-email
+    admin_password: metabase-admin-password
+    encryption_key: metabase-encryption-key
+    bigquery:
+      project: metabase-bigquery-project
+      dataset: metabase-bigquery-dataset
+      service_account: metabase-bigquery-service-account
+      json_key_optional: metabase-bigquery-key
