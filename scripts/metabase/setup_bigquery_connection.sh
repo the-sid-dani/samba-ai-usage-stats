@@ -63,13 +63,13 @@ ensure_sa() {
   local sa_id="metabase-bq-reader"
   local sa_email="$sa_id@${PROJECT_ID}.iam.gserviceaccount.com"
   if gcloud iam service-accounts describe "$sa_email" --project "$PROJECT_ID" >/dev/null 2>&1; then
-    echo "SA exists: $sa_email"
+    >&2 echo "SA exists: $sa_email"
   else
     gcloud iam service-accounts create "$sa_id" \
       --display-name="Metabase BigQuery Reader" \
       --project "$PROJECT_ID"
   fi
-  echo "$sa_email"
+  printf "%s\n" "$sa_email"
 }
 
 grant_roles() {
