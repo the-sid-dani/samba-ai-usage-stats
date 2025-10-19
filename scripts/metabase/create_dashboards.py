@@ -26,7 +26,7 @@ Usage examples:
     --out dashboards.json
 """
 import argparse, json, os, sys, time, pathlib
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 import requests
 from dotenv import load_dotenv
 
@@ -83,7 +83,32 @@ def read_sql_files(sql_dir: str) -> List[Dict[str, str]]:
     return out
 
 
-def create_card(sess: requests.Session, host: str, db_id: int, title: str, sql: str) -> int:
+def _build_template_tags(sql: str, param_index: Dict[str, Dict[str, Any]]) -> Tuple[Dict[str, Dict[str, Any]], List[str]]:
+    tags: Dict[str, Dict[str, Any]] = {}
+    used: List[str] = []
+    for slug, meta in param_index.items():
+        if f"{{{{{slug}" in sql:
+            used.append(slug)
+            tags[slug] = {
+                "id": meta["id"],
+                "name": slug,
+                "display-name": meta["name"],
+                "type": meta.get("type", "text"),
+                "widget-type": meta.get("_widget", meta.get("type", "text")),
+                "default": meta.get("default"),
+            }
+    return tags, used
+
+
+def create_card(
+    sess: requests.Session,
+    host: str,
+    db_id: int,
+    title: str,
+    sql: str,
+    param_index: Dict[str, Dict[str, Any]],
+) -> Tuple[int, List[str]]:
+    template_tags, used_slugs = _build_template_tags(sql, param_index)
     payload = {
         "name": title,
         "dataset_query": {
@@ -95,9 +120,10 @@ def create_card(sess: requests.Session, host: str, db_id: int, title: str, sql: 
         "visualization_settings": {},
         "description": title,
     }
+    payload["dataset_query"]["native"]["template-tags"] = template_tags
     r = sess.post(f"{host.rstrip('/')}/api/card", json=payload)
     r.raise_for_status()
-    return r.json()["id"]
+    return r.json()["id"], used_slugs
 
 
 def create_dashboard(
@@ -107,15 +133,31 @@ def create_dashboard(
     if collection_id is not None:
         payload["collection_id"] = collection_id
     r = sess.post(f"{host.rstrip('/')}/api/dashboard", json=payload)
-    r.raise_for_status()
+    if r.status_code >= 400:
+        raise SystemExit(
+            "Metabase create_dashboard failed "
+            f"{r.status_code}: {r.text}"
+        )
     return r.json()["id"]
 
 
-def add_card_to_dashboard(
-    sess: requests.Session, host: str, dash_id: int, card_id: int, row: int, col: int, sx: int = 8, sy: int = 6
+def update_dashboard_layout(
+    sess: requests.Session,
+    host: str,
+    dash_id: int,
+    name: str,
+    parameters: List[Dict[str, Any]],
+    dashcards: List[Dict[str, Any]],
+    collection_id: Optional[int],
 ) -> None:
-    payload = {"cardId": card_id, "row": row, "col": col, "sizeX": sx, "sizeY": sy}
-    r = sess.post(f"{host.rstrip('/')}/api/dashboard/{dash_id}/cards", json=payload)
+    payload: Dict[str, Any] = {
+        "name": name,
+        "parameters": parameters,
+        "dashcards": dashcards,
+    }
+    if collection_id is not None:
+        payload["collection_id"] = collection_id
+    r = sess.put(f"{host.rstrip('/')}/api/dashboard/{dash_id}", json=payload)
     r.raise_for_status()
 
 
@@ -125,11 +167,19 @@ def parse_number_kv(pairs: List[str]) -> List[Dict[str, Any]]:
         if "=" not in p:
             continue
         k, v = p.split("=", 1)
+        slug = k.strip()
         try:
             vnum = float(v)
         except ValueError:
             vnum = v
-        out.append({"name": k, "slug": k, "type": "number", "default": vnum})
+        out.append({
+            "id": f"mb_param_{slug}",
+            "name": k,
+            "slug": slug,
+            "type": "number",
+            "default": vnum,
+            "_widget": "number",
+        })
     return out
 
 
@@ -165,27 +215,74 @@ def main():
     # Build dashboard parameters
     params: List[Dict[str, Any]] = []
     for p in args.param:
+        slug = p.strip()
         if "date" in p:
-            params.append({"name": p, "slug": p, "type": "date/all-options"})
+            params.append({
+                "id": f"mb_param_{slug}",
+                "name": p,
+                "slug": slug,
+                "type": "date/all-options",
+                "default": None,
+                "_widget": "date/all-options",
+            })
         else:
-            params.append({"name": p, "slug": p, "type": "text"})
+            params.append({
+                "id": f"mb_param_{slug}",
+                "name": p,
+                "slug": slug,
+                "type": "text",
+                "default": None,
+                "_widget": "text",
+            })
     params.extend(parse_number_kv(args.number))
+
+    param_index = {p["slug"]: p for p in params}
 
     dash_id = create_dashboard(sess, host, args.dashboard_name, args.collection_id, params)
 
     # Create cards and lay them out 3 per row (24-col grid -> 8 units each)
     created = []
+    dashcards_payload: List[Dict[str, Any]] = []
     col = 0
     row = 0
     for f in sql_files:
-        card_id = create_card(sess, host, db_id, f["name"], f["sql"])
-        add_card_to_dashboard(sess, host, dash_id, card_id, row=row, col=col, sx=8, sy=6)
+        card_id, used_slugs = create_card(sess, host, db_id, f["name"], f["sql"], param_index)
         created.append({"card_id": card_id, "name": f["name"], "file": f["file"]})
+        dashcards_payload.append(
+            {
+                "id": -(len(dashcards_payload) + 1),
+                "card_id": card_id,
+                "row": row,
+                "col": col,
+                "size_x": 8,
+                "size_y": 6,
+                "series": [],
+                "visualization_settings": {},
+                "parameter_mappings": [
+                    {
+                        "parameter_id": param_index[slug]["id"],
+                        "card_id": card_id,
+                        "target": ["variable", ["template-tag", slug]],
+                    }
+                    for slug in used_slugs
+                ],
+                "dashboard_tab_id": None,
+            }
+        )
         col += 8
         if col >= 24:
             col = 0
             row += 6
 
+    update_dashboard_layout(
+        sess,
+        host,
+        dash_id,
+        args.dashboard_name,
+        params,
+        dashcards_payload,
+        args.collection_id,
+    )
     result = {
         "dashboard_id": dash_id,
         "dashboard_url": f"{host.rstrip('/')}/dashboard/{dash_id}",
