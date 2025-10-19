@@ -1,0 +1,130 @@
+schema: 1
+story: '3.8'
+story_title: 'Fix Claude Jobs Secret Manager Access and Daily Automation'
+gate: CONCERNS
+status_reason: 'Infrastructure is 100% complete and working perfectly. However, ETL script has a date logic bug (ending_at must be after starting_at) that prevents successful data ingestion. This is a code fix, not infrastructure issue.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2025-10-19T20:35:00Z'
+
+top_issues:
+  - severity: medium
+    category: runtime_error
+    description: 'ETL scripts fail with date validation error: ending_at must be after starting_at'
+    impact: 'Daily incremental loads are blocked; data remains stale at Oct 17'
+    refs:
+      - 'Cloud Run job execution logs (claude-costs-job, claude-usage-job, claude-code-job)'
+    suggested_owner: dev
+    remediation: 'Fix date calculation logic in ETL scripts to ensure ending_at > starting_at for incremental loads'
+
+waiver:
+  active: false
+
+quality_score: 90
+expires: '2025-11-02T20:35:00Z'
+
+evidence:
+  infrastructure_verified:
+    - 'Secret Manager secret anthropic-admin-api-key created with correct API key'
+    - 'IAM permissions granted (roles/secretmanager.secretAccessor to ai-usage-pipeline SA)'
+    - 'All 3 Cloud Run jobs updated with correct env vars (ANTHROPIC_SECRET_ID, ANTHROPIC_ORGANIZATION_ID)'
+    - 'All 3 Cloud Schedulers created and ENABLED (6:30 AM PT daily)'
+    - 'Manual job execution succeeds (no auth errors, no Secret Manager errors)'
+  tests_reviewed:
+    count: 4
+    manual_tests_executed:
+      - 'Secret Manager IAM policy verification'
+      - 'Cloud Scheduler existence and configuration'
+      - 'Cloud Run job environment variable validation'
+      - 'Manual job execution (authentication working)'
+  risks_identified:
+    count: 1
+  trace:
+    ac_covered: [1, 2, 3, 6]
+    ac_gaps: [4, 5]
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Secret Manager properly configured with least-privilege IAM. API keys stored securely, not hardcoded. Service account permissions correctly scoped.'
+  performance:
+    status: PASS
+    notes: 'Scheduler timing appropriate (6:30 AM PT daily). Jobs configured for parallel execution. No performance concerns identified.'
+  reliability:
+    status: CONCERNS
+    notes: 'Jobs fail reliably due to date logic bug. Infrastructure is reliable and working, but application code prevents successful operation.'
+  maintainability:
+    status: PASS
+    notes: 'Infrastructure well-documented. .env file properly updated with correct variable names. Service account naming clear and consistent.'
+
+recommendations:
+  immediate:
+    - action: 'Create Story 3.9 to fix ETL script date calculation bug'
+      refs:
+        - 'src/ingestion/ingest_claude_costs.py (date calculation logic)'
+        - 'src/ingestion/ingest_claude_usage.py (date calculation logic)'
+        - 'src/ingestion/ingest_claude_code.py (date calculation logic)'
+      priority: P1
+      rationale: 'Blocks daily automation and data freshness. Quick fix needed to unblock Epic 3 completion.'
+    - action: 'Investigate date calculation logic - likely issue with timezone or end_date=start_date edge case'
+      refs:
+        - 'Error logs showing ending_at must be after starting_at'
+      priority: P1
+      rationale: 'Need to understand if issue is timezone conversion, same-day edge case, or off-by-one error.'
+  future:
+    - action: 'Add integration tests for ETL scripts to catch date logic bugs before deployment'
+      refs: []
+      priority: P2
+      rationale: 'Would have caught this bug in CI/CD pipeline before production deployment.'
+    - action: 'Consider adding Cloud Run job execution alerts for consecutive failures'
+      refs: []
+      priority: P3
+      rationale: 'Proactive monitoring would detect issues earlier than manual checks.'
+
+acceptance_criteria_status:
+  AC1_secret_manager_access:
+    status: PASS
+    evidence: 'IAM policy shows ai-usage-pipeline SA has secretAccessor role'
+  AC2_jobs_fetch_api_key:
+    status: PASS
+    evidence: 'No Secret Manager or authentication errors in logs; jobs progress past API key fetch to date validation error'
+  AC3_schedulers_created:
+    status: PASS
+    evidence: 'All 3 schedulers exist, configured for 6:30 AM PT, status ENABLED'
+  AC4_manual_execution_success:
+    status: FAIL
+    evidence: 'Jobs execute but fail with date validation error, not infrastructure issue'
+  AC5_scheduled_execution_2_days:
+    status: BLOCKED
+    evidence: 'Cannot validate until AC4 is resolved (script bug fix needed)'
+  AC6_no_secret_manager_errors:
+    status: PASS
+    evidence: 'Logs show no Secret Manager permission errors; authentication working perfectly'
+
+dev_notes: |
+  INFRASTRUCTURE ASSESSMENT: EXCELLENT
+
+  The infrastructure work is flawless:
+  - Secret Manager configuration is perfect
+  - IAM permissions are correctly set
+  - Cloud Schedulers are properly configured
+  - Environment variables are correct
+  - Service accounts are properly used
+
+  The developer correctly identified and documented that this is a script bug,
+  not an infrastructure issue. The recommendation to create Story 3.9 is appropriate.
+
+  GATE DECISION RATIONALE:
+
+  Why CONCERNS instead of PASS:
+  - 4/6 acceptance criteria met (AC1, AC2, AC3, AC6 all PASS)
+  - AC4 fails due to application code bug (not infrastructure)
+  - AC5 blocked by AC4
+
+  Why CONCERNS instead of FAIL:
+  - Infrastructure work is 100% complete and working
+  - The blocking issue is clearly identified and scoped
+  - Story accurately documents the limitation
+  - Follow-up path is clear (Story 3.9)
+
+  This is a textbook case where infrastructure epic work is done,
+  but application code needs a follow-up fix.

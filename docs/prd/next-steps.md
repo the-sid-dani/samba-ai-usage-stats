@@ -1,10 +1,36 @@
 # Next Steps
 
-## UX Expert Prompt
-Review this PRD and create comprehensive UI/UX specifications for the multi-stakeholder dashboard system, focusing on role-based user experiences and finance team workflow optimization.
+## Architect Handoff
+Use this PRD to create technical architecture documentation covering:
+- BigQuery schema design with partitioning strategy
+- ETL pipeline architecture for each data source
+- Metabase deployment specification
+- API integration patterns and error handling
 
-## Architect Prompt
-Use this PRD to create detailed technical architecture documentation covering the serverless data pipeline, BigQuery schema design, and Cloud Run deployment specifications for the AI usage analytics system.
+Reference preserved documentation:
+- `/docs/api-reference/cursor-api-specs.md`
+- `/docs/api-reference/metabase-architecture.md`
+
+## Developer Handoff
+Break down epics into user stories focusing on:
+- Table creation and schema implementation
+- API client development with testing
+- Dashboard creation with Metabase API
+- Automation and monitoring setup
+
+## Success Metrics
+
+**30-Day Milestones:**
+- All 6 BigQuery tables populated with accurate data
+- 4 Metabase dashboards operational
+- Daily automation running reliably
+- Finance team using system for monthly reporting
+
+**90-Day Goals:**
+- 15% cost savings identified through analytics
+- 80% reduction in manual reporting effort
+- >99% system uptime achieved
+- Positive user feedback from finance and engineering teams
 
 ---
 

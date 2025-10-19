@@ -1,32 +1,77 @@
 # User Interface Design Goals
 
-## Overall UX Vision
-Clean, finance-focused dashboard emphasizing cost visibility and trend analysis. Primary users are finance professionals who need quick access to spending summaries, cost allocation by user/team, and month-over-month comparisons. Interface should minimize cognitive load while providing drill-down capabilities for detailed analysis.
+## Dashboard Strategy
 
-## Key Interaction Paradigms
-- **Role-based Navigation:** Different menu structures for Finance vs Engineering vs Admin users
-- **Contextual Help:** Embedded tooltips and metric definitions for non-technical finance users
-- **Progressive Disclosure:** Summary cards that expand to detailed breakdowns on click
-- **Cross-Dashboard Linking:** Ability to jump from cost anomaly to productivity details for root cause analysis
+**Platform:** Self-hosted Metabase on GCP Compute Engine
+**Architecture:** See `/docs/api-reference/metabase-architecture.md`
+**Cost:** ~$25/month VM + $0 licensing
 
-## Core Screens and Views
-1. **Finance Executive Dashboard** - High-level spend summary with budget variance alerts
-2. **Cost Allocation Workbench** - Detailed user/team/project cost breakdowns with export tools
-3. **Engineering Productivity Analytics** - Developer efficiency metrics and team comparisons
-4. **Platform ROI Analysis** - Cost-per-productivity calculations across all AI tools
-5. **System Administration Panel** - Data quality monitoring and manual controls (admin-only)
-6. **Compliance & Security View** - Access auditing and API key management (security-only)
+## Core Dashboards (4 Required)
 
-## Accessibility: WCAG AA
-- **Keyboard Navigation:** Full dashboard navigation without mouse for accessibility compliance
-- **Screen Reader Support:** Proper ARIA labels for all charts and data tables
-- **Color Blind Friendly:** Blue/orange color scheme instead of red/green for status indicators
-- **High Contrast Mode:** Optional high contrast theme for visually impaired users
+### 1. Executive Summary Dashboard
+**Target Users:** Finance Team, C-Suite
+**Data Sources:** All expense tables aggregated
+**Key Metrics:**
+- Total monthly AI spend across all platforms
+- Month-over-month growth rate
+- Platform cost distribution (pie chart)
+- Top 5 users by spend
+- Budget vs actual variance
 
-## Branding
-Corporate-standard Metabase styling with clear, professional aesthetic focused on data readability rather than visual flourishes, utilizing Metabase theming capabilities for consistent branding.
+**Visualizations:**
+- KPI cards (total spend, growth %)
+- Line chart (monthly trends)
+- Pie chart (platform distribution)
+- Bar chart (user ranking)
 
-## Target Device and Platforms: Web Responsive
-Primary usage on desktop/laptop for detailed analysis, with responsive design supporting tablet access for executive summary views.
+### 2. Cost Allocation Workbench
+**Target Users:** Finance Team, Department Heads
+**Data Sources:** All expense tables + user mapping
+**Key Metrics:**
+- User-level cost breakdown
+- Team/department aggregations
+- Platform-by-user spend matrix
+- Cost per productivity ratios
+
+**Visualizations:**
+- Detailed cost tables (sortable, filterable)
+- Heatmap (user × platform spending)
+- Export-friendly format for budget reviews
+
+### 3. Productivity Analytics Dashboard
+**Target Users:** Engineering Managers, Team Leads
+**Data Sources:** `claude_code_usage_stats`, `cursor_usage_stats`
+**Key Metrics:**
+- Lines of code accepted (acceptance rate)
+- Commits and PRs generated with AI
+- Developer efficiency rankings
+- Tool effectiveness comparison (Claude Code vs Cursor)
+
+**Visualizations:**
+- Acceptance rate trends (line chart)
+- Productivity heatmap (team performance)
+- Tool comparison (side-by-side metrics)
+
+### 4. Platform ROI Analysis
+**Target Users:** Technical Architects, Finance
+**Data Sources:** All tables (usage + expenses)
+**Key Metrics:**
+- Cost per line of code
+- Cost per accepted suggestion
+- Platform efficiency scores
+- ROI by user and platform
+
+**Visualizations:**
+- Scatter plots (cost vs productivity)
+- ROI trend lines
+- Efficiency comparison charts
+- Platform recommendation insights
+
+## Accessibility & Usability
+
+- **WCAG AA Compliance:** Full keyboard navigation, screen reader support
+- **Color Scheme:** Color-blind friendly (blue/orange, not red/green)
+- **Responsive Design:** Desktop-optimized with tablet support
+- **Export Options:** CSV, XLSX, JSON, PNG for all dashboards
 
 ---

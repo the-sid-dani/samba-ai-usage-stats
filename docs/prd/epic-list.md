@@ -1,31 +1,54 @@
 # Epic List
 
-**Epic 1: Foundation & Cursor Integration**
-Establish project infrastructure, BigQuery data warehouse, and complete Cursor platform integration delivering first usable dashboard for engineering productivity metrics.
+## Epic 1: Foundation & Data Infrastructure
+**Goal:** Establish BigQuery data warehouse and manual upload workflows
+**Deliverables:**
+- Create 6 BigQuery tables with proper schema
+- Set up Google Sheets → BigQuery sync for claude.ai usage
+- Create API key mapping table and management process
+- Implement basic data validation checks
 
-**Epic 2: Anthropic Multi-Platform Integration**
-Add Anthropic Claude API integration covering Claude API, Claude Code, and Claude.ai usage data with unified user attribution and cost allocation capabilities.
+**Success Criteria:** Can manually upload claude.ai data and query in BigQuery
 
-**Epic 3: Advanced Analytics & Finance Dashboard**
-Implement comprehensive cost analysis, budget tracking, and finance-specific reporting with automated alerting for cost anomalies and variance detection.
+## Epic 2: Cursor Integration
+**Goal:** Automate Cursor data collection for usage and costs
+**Deliverables:**
+- Implement Cursor API client using documented specs
+- Build ETL pipeline: Cursor API → BigQuery (usage + expenses)
+- Add error handling and retry logic
+- Validate data accuracy against Cursor dashboard
 
-**Epic 4: Production Hardening & Monitoring**
-Deploy production-grade monitoring, data quality validation, security hardening, and operational documentation for long-term system reliability.
+**Success Criteria:** Daily automated Cursor data flowing to BigQuery with 99% accuracy
 
-**Epic 5: Infrastructure Provisioning & Deployment**
-Execute infrastructure provisioning, deploy all services to production, and validate end-to-end system integration with real data sources for business-ready operation.
+## Epic 3: Claude Platform Integration
+**Goal:** Automate Claude ecosystem data collection (Code + expenses + API)
+**Deliverables:**
+- Implement Claude Admin API client for `/claude_code` endpoint
+- Build cost report parser for claude_expenses (all platforms)
+- Filter API usage costs into api_usage_expenses
+- Implement platform segmentation logic
 
-**Epic 6: Metabase Dashboard Platform**
-Replace planned Looker Studio with free self-hosted Metabase on GCP Compute Engine, providing all 6 dashboard types with API-driven management capabilities while maintaining existing BigQuery data pipeline integrity.
+**Success Criteria:** All Claude data sources automated with correct platform attribution
 
-## Epic Rationale
-- **Epic 1** provides immediate value to engineering team while proving technical architecture
-- **Epic 2** adds the primary cost data sources needed by finance team
-- **Epic 3** delivers the core business value for cost optimization and budget planning
-- **Epic 4** ensures enterprise-grade reliability and maintainability
-- **Epic 5** bridges development to production, ensuring actual business value delivery
-- **Epic 6** provides cost-effective dashboard solution with superior API capabilities and zero licensing costs
+## Epic 4: Metabase Dashboard Suite
+**Goal:** Deploy self-hosted Metabase with 4 core dashboards
+**Deliverables:**
+- Provision GCP VM and deploy Metabase via Docker
+- Connect to BigQuery with service account
+- Build 4 dashboards: Executive, Cost Allocation, Productivity, ROI
+- Configure export capabilities and user access
 
-Each epic delivers deployable functionality that provides tangible value to users, with logical dependencies flowing from infrastructure to data sources to analytics to operations.
+**Success Criteria:** Finance team can independently access dashboards and export data
+
+## Epic 5: Production Hardening
+**Goal:** Ensure system reliability and operational readiness
+**Deliverables:**
+- Implement Cloud Scheduler for daily automation
+- Add comprehensive monitoring and alerting
+- Create runbook for common operations
+- Implement automated backup for Metabase VM
+- Document user guides and admin procedures
+
+**Success Criteria:** System runs autonomously for 30 days with >99% uptime
 
 ---

@@ -1,42 +1,78 @@
 # Technical Assumptions
 
-## Repository Structure: Monorepo
-Single repository containing all components: Python ingestion scripts, BigQuery schema definitions, Looker dashboard configurations, and documentation. This approach simplifies dependency management and deployment coordination for the relatively small codebase.
+## Infrastructure
 
-## Service Architecture
-**Serverless Microservices within Monorepo:** Cloud Run containerized jobs for each data source (Anthropic Claude API, Cursor API) with shared BigQuery client and utilities. This provides scalability and fault isolation while maintaining operational simplicity for daily batch processing.
+**Google Cloud Platform:**
+- **Project:** `ai-workflows-459123` (existing)
+- **BigQuery Dataset:** `ai_usage_analytics` (US region)
+- **Compute Engine:** e2-medium VM for Metabase (~$25/month)
+- **Secret Manager:** API key storage with quarterly rotation
+- **Cloud Scheduler:** Daily trigger at 6 AM PT
 
-## Testing Requirements
-**Unit + Integration Testing:**
-- Unit tests for API clients with mocking (pytest framework)
-- Integration tests with BigQuery sandbox for data pipeline validation
-- Data quality validation checks with schema drift detection
-- Load testing simulating 30-day historical backfill scenarios
+**Python Runtime:**
+- **Version:** Python 3.11+
+- **Key Libraries:** `google-cloud-bigquery`, `requests`, `pandas`
+- **Container:** Docker with multi-stage builds
 
-## Additional Technical Assumptions and Requests
+## Data Sources & APIs
 
-**Infrastructure & Deployment:**
-- **Google Cloud Platform:** Existing project ai-workflows-459123 with BigQuery, Cloud Run, Secret Manager
-- **Python 3.11:** Runtime environment with google-cloud libraries and requests
-- **Container Strategy:** Multi-stage Docker builds optimized for Cloud Run cold starts
-- **Scheduling:** Google Cloud Scheduler triggering daily jobs at 6 AM PT
+**1. Claude Admin API** (documented in `/docs/api-reference/`)
+- **Endpoint 1:** `/v1/organizations/usage_report/claude_code` → claude_code_usage_stats
+- **Endpoint 2:** `/v1/organizations/cost_report` → claude_expenses, api_usage_expenses
+- **Authentication:** Admin API key (x-api-key header)
+- **Rate Limits:** Standard Anthropic limits with backoff
 
-**Data Architecture:**
-- **BigQuery Dataset:** US region with partitioned tables for cost optimization
-- **Data Retention:** 2+ years for historical trend analysis and compliance
-- **Identity Resolution:** Google Sheets as manual mapping source for API key attribution
-- **Data Quality:** Automated validation against vendor invoice reconciliation
+**2. Cursor Admin API** (documented in `/docs/api-reference/cursor-api-specs.md`)
+- **Endpoint:** `/teams/daily-usage-data` → cursor_usage_stats, cursor_expenses
+- **Authentication:** Basic auth (API key as username)
+- **Rate Limits:** 90-day max date range per request
 
-**Security & Compliance:**
-- **Secret Management:** Google Secret Manager for API keys with quarterly rotation
-- **Access Controls:** IAM with principle of least privilege for service accounts
-- **Audit Logging:** Structured JSON logging to Cloud Logging for all operations
-- **Data Encryption:** Google-managed keys at rest, TLS 1.2+ in transit
+**3. Google Sheets**
+- **Purpose:** Manual upload for claude.ai usage, API key mapping
+- **Sync Method:** BigQuery Sheets connector or manual CSV import
+- **Update Frequency:** Weekly/monthly manual updates
 
-**Monitoring & Operations:**
-- **Health Checks:** /health endpoints for Cloud Run services
-- **Error Handling:** Exponential backoff with circuit breaker patterns
-- **Alerting:** Cost anomaly detection and data staleness monitoring
-- **Performance:** 2-hour SLA for daily processing completion
+## Metabase Architecture
+
+**Reference:** `/docs/api-reference/metabase-architecture.md`
+
+**Deployment:**
+- GCP Compute Engine e2-medium VM
+- Docker Compose (Metabase + PostgreSQL)
+- BigQuery connection via service account
+- Automated backup to Cloud Storage
+
+**API Capabilities:**
+- Dashboard creation via REST API
+- Programmatic widget/card management
+- Scheduled reports and email delivery
+- Export in multiple formats
+
+## Data Quality & Validation
+
+**Validation Checks:**
+- Schema compliance (required fields present)
+- Data freshness (last updated < 48 hours)
+- Cost reconciliation (API totals match invoices ±5%)
+- Duplicate detection (deduplication on date + user)
+
+**Error Handling:**
+- Exponential backoff for API retries (3 attempts)
+- Circuit breaker pattern for repeated failures
+- Structured logging to Cloud Logging
+- Email alerts for data staleness >48 hours
+
+## Security & Compliance
+
+**API Key Management:**
+- Store in Google Secret Manager (never in code)
+- Rotate quarterly with documented procedure
+- Least privilege IAM for service accounts
+- Audit logging enabled for all access
+
+**Data Encryption:**
+- At rest: Google-managed keys
+- In transit: TLS 1.2+
+- Network: VPC with firewall rules for Metabase VM
 
 ---

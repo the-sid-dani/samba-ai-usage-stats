@@ -1,23 +1,41 @@
 # Goals and Background Context
 
 ## Goals
-- **Financial Visibility:** Unified dashboard providing 100% AI spending visibility across Claude.ai, Claude Code, Claude API, and Cursor platforms
-- **Cost Optimization:** Enable identification of 15-20% cost savings opportunities within 1 quarter through data-driven insights
-- **Operational Efficiency:** Reduce manual reporting effort by 80% through automated daily data ingestion and dashboard generation
-- **ROI Tracking:** Provide clear metrics on AI tool usage efficiency and productivity gains across team members
-- **Budget Planning:** Support quarterly budget forecasting with accurate historical usage and cost trends
+
+- **Unified Cost Visibility:** Provide 100% spending visibility across Claude ecosystem (claude.ai, Claude Code, Claude API) and Cursor platform through consolidated BigQuery data warehouse and Metabase dashboards
+- **Platform-Specific Analytics:** Enable distinct analysis of chat-based AI usage (claude.ai) vs developer productivity tools (Claude Code, Cursor) with separate usage and cost tracking
+- **Cost Optimization:** Identify 15-20% cost savings opportunities within 1 quarter through data-driven insights into usage patterns and platform efficiency
+- **Operational Efficiency:** Reduce manual reporting effort by 80% through automated data ingestion from APIs and manual upload workflows
+- **ROI Tracking:** Measure AI tool productivity gains with metrics including acceptance rates, lines of code, and cost-per-productivity calculations
 
 ## Background Context
 
-Our organization currently spends $7k+ monthly across 4 different AI platforms (Claude.ai, Claude Code, Claude API, and Cursor) with 30-40 API keys distributed among ~15 team members. The finance team (Jaya) lacks consolidated visibility into this spending, resulting in manual effort for quarterly reviews and missed optimization opportunities.
+Our organization uses multiple AI platforms across different use cases:
+- **Claude.ai:** Chat-based knowledge work and research (~$2-3k/month)
+- **Claude Code:** IDE-integrated coding assistance (~$2-3k/month)
+- **Claude API:** Programmatic API usage for automation (~$1-2k/month)
+- **Cursor:** AI-powered IDE for development (~$2-3k/month)
 
-This PRD addresses the critical need for a unified analytics dashboard that automates data collection from vendor APIs, stores information in a BigQuery data warehouse, and presents finance-focused KPIs through Looker dashboards. The solution will provide single source of truth for AI usage patterns, cost allocation by user/team, and ROI metrics essential for strategic decision-making.
+**Total Monthly Spend:** $7-10k across ~15 team members
+
+**Current Pain Points:**
+- No unified view of AI spending across platforms
+- Manual effort required for cost allocation and reporting
+- Inability to compare platform efficiency (cost per productivity)
+- No automation for daily data collection and analysis
+- Finance team (Jaya) lacks visibility for budget planning
+
+This PRD defines a simplified 3-platform analytics system (removing Gemini from scope) that:
+1. Automates data collection from APIs where available
+2. Provides manual upload workflow for claude.ai (no programmatic API)
+3. Stores all data in BigQuery with 6 focused tables
+4. Delivers insights through self-hosted Metabase dashboards
 
 ## Change Log
+
 | Date | Version | Description | Author |
 |------|---------|-------------|--------|
-| September 26, 2025 | 1.0 | Initial PRD creation from Project Brief | John (PM) |
-| September 27, 2025 | 1.1 | Added Epic 5 deployment execution requirements and stories | John (PM) |
-| September 27, 2025 | 1.2 | Updated for Metabase transition replacing Looker Studio | John (PM) |
+| September 26, 2025 | 1.0 | Initial PRD with 4 platforms + Looker | John (PM) |
+| October 17, 2025 | 2.0 | Simplified to 3 platforms, 6 tables, Metabase focus, manual claude.ai upload | John (PM) |
 
 ---
