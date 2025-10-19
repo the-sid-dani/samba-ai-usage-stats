@@ -50,7 +50,19 @@ def resolve_db_id(sess: requests.Session, host: str, name: Optional[str], dbid: 
         return int(dbid)
     r = sess.get(f"{host.rstrip('/')}/api/database")
     r.raise_for_status()
-    dbs = r.json()
+    payload = r.json()
+    if isinstance(payload, dict):
+        if isinstance(payload.get("data"), list):
+            dbs = payload["data"]
+        else:
+            dbs = []
+            for value in payload.values():
+                if isinstance(value, list):
+                    dbs.extend(value)
+    else:
+        dbs = payload
+    if not isinstance(dbs, list):
+        raise SystemExit("Unexpected Metabase /api/database payload; cannot resolve database id")
     if name:
         for d in dbs:
             if d.get("engine") == "bigquery" and name.lower() in str(d.get("name", "")).lower():
