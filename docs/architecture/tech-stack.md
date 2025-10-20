@@ -18,5 +18,9 @@
 | VM Infrastructure | GCP Compute Engine | e2-medium | Metabase hosting | Reliable, managed VM for self-hosted solution |
 | VM Database | PostgreSQL | 15+ | Metabase metadata | Required for Metabase configuration storage |
 | API Key Mapping | Google Sheets API | v4 | Manual identity resolution | Simple spreadsheet for 30-40 keys |
+| Dashboard Automation | Metabase REST API | Latest | Programmatic chart/filter creation | API-first for dashboard-as-code approach |
+| Configuration Management | JSON + Python | jsonschema 4.20+ | Chart/filter configuration | Systematic chart type mapping and validation |
+| Chart Templates | chart_templates.py | N/A | Visualization settings reference | Defines viz_settings for 13 chart types |
+| Filter Templates | filter_templates.py | N/A | Field filter configurations | Defines 9 filter widget types |
 
 ---

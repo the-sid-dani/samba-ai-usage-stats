@@ -23,6 +23,7 @@ This unified approach combines what would traditionally be separate backend and 
 |------|---------|-------------|--------|
 | September 27, 2025 | 1.0 | Initial architecture from PRD requirements | Winston (Architect) |
 | September 26, 2025 | 2.0 | Updated for Metabase platform and fullstack template | Winston (Architect) |
+| October 19, 2025 | 2.1 | Added Metabase chart automation components and source tree | Winston (Architect) |
 
 ---
 
@@ -122,6 +123,8 @@ graph TB
 | VM Infrastructure | GCP Compute Engine | Latest | Metabase hosting platform | e2-medium instance for dashboard workload |
 | Backup System | PostgreSQL pg_dump | 15+ | Metadata backup | Automated backup for dashboard configurations |
 | Reverse Proxy | nginx | 1.24+ | HTTPS termination | SSL/TLS for secure dashboard access |
+| Dashboard Automation | Metabase REST API | Latest | Programmatic chart creation | API-first for 13 chart types and 9 filter types |
+| Configuration Validation | jsonschema + pydantic | 4.20+ / 2.5+ | Chart/filter config validation | Systematic configuration management |
 
 ---
 
@@ -521,6 +524,23 @@ interface DashboardResponse {
 
 **Technology Stack:** Python Metabase API client, YAML configuration parsing
 
+#### Metabase Chart Automation System (NEW - Oct 2025)
+**Responsibility:** Claude-assisted creation of all chart types (13) and filter types (9) via enhanced create_dashboards.py script
+
+**Key Interfaces:**
+- `create_card(display_type, viz_settings)` - Create chart with specific type and visualization settings
+- `create_dimension_parameter(table, column, widget_type)` - Create field filter with dropdown/search/date widgets
+- `load_chart_config(config_file)` - Load chart type mappings from chart_config.json
+- `resolve_field_id(table, column)` - Resolve BigQuery field IDs for field filter parameters
+
+**Dependencies:** Metabase REST API, BigQuery metadata API, chart_templates.py, filter_templates.py, config_loader.py
+
+**Technology Stack:** Python requests, JSON configuration management, field filter API integration
+
+**Chart Types Supported:** scalar (KPIs), line (trends), bar (comparisons), pie (breakdowns), gauge (progress), combo (dual-axis), area (cumulative), row (horizontal bars), scatter (correlation), funnel (conversion), waterfall (sequential), pivot (multi-dimensional), table (detailed data)
+
+**Filter Types Supported:** Field filters (dropdown, multi-select, search, date range, relative date, number range), Static filters (date, number, text)
+
 ### Orchestration Components
 
 #### Daily Pipeline Orchestrator
@@ -802,19 +822,29 @@ samba-ai-usage-stats/
 │   │   └── cost_allocation.sql
 │   └── migrations/                    # Schema migration scripts
 │       └── 001_initial_schema.sql
-├── metabase/                          # Metabase deployment
+├── scripts/metabase/                  # Metabase automation scripts
+│   ├── create_dashboards.py          # Dashboard creation (enhanced for charts/filters)
+│   ├── create_single_card.py         # Single card creation
+│   ├── chart_templates.py            # Chart visualization templates (NEW - Oct 2025)
+│   ├── filter_templates.py           # Filter configuration templates (NEW - Oct 2025)
+│   ├── config_loader.py              # Configuration loader (NEW - Oct 2025)
+│   ├── validate_config.py            # Config validation (NEW - Oct 2025)
+│   ├── chart_config.json             # Chart type mappings (NEW - Oct 2025)
+│   ├── filter_config.json            # Filter presets (NEW - Oct 2025)
+│   ├── run_dashboard_creation.sh     # Automation wrapper
+│   └── setup_bigquery_connection.sh  # BigQuery connection setup
+├── infrastructure/metabase/           # Metabase VM deployment
 │   ├── docker-compose.yml             # Metabase + PostgreSQL
-│   ├── dashboards/                    # Dashboard configurations
-│   │   ├── finance-executive.yaml
-│   │   ├── cost-allocation.yaml
-│   │   ├── engineering-productivity.yaml
-│   │   ├── platform-roi.yaml
-│   │   ├── system-admin.yaml
-│   │   └── compliance-security.yaml
-│   ├── backup-scripts/                # Database backup automation
-│   │   ├── backup.sh
-│   │   └── restore.sh
-│   └── nginx.conf                     # Reverse proxy config
+│   ├── metabase.env.example           # Environment template
+│   ├── backup-metabase.sh             # Backup automation
+│   ├── startup.sh                     # VM startup script
+│   └── README.md
+├── examples/                          # Example configurations (NEW - Oct 2025)
+│   └── chart_configs/
+│       ├── example_line_chart.json
+│       ├── example_pie_chart.json
+│       ├── example_multi_chart.json
+│       └── example_with_filters.json
 ├── infrastructure/                    # Deployment configurations
 │   ├── cloud_run/
 │   │   ├── service.yaml               # Cloud Run service definition
