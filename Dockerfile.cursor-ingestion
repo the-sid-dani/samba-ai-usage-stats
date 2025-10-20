@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements-claude-ingestion.txt .
+RUN pip install --no-cache-dir -r requirements-claude-ingestion.txt
+
+# Copy Cursor ingestion scripts
+COPY scripts/ingestion/cursor_client.py .
+COPY scripts/ingestion/ingest_cursor_daily.py .
+
+# Run ingestion (defaults to yesterday if no TARGET_DATE provided)
+CMD ["python", "ingest_cursor_daily.py"]
