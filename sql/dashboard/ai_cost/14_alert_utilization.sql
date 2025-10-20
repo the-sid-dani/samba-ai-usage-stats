@@ -1,27 +1,28 @@
 -- AI Cost Dashboard: Utilization Alert Card (inactive seats)
--- Requires dashboard parameter {{total_seats}} (number). Defaults to 250 if not provided.
-WITH params AS (
-  SELECT
-    COALESCE({{date_range.end}}, DATE '2025-12-31') AS end_date,
-    COALESCE({{inactive_window_days}}, 14) AS window_days,
-    COALESCE({{total_seats}}, 250) AS total_seats
-),
-recent_activity AS (
+-- Requires dashboard parameters: {{total_seats}}, {{inactive_window_days}}, {{end_date}}
+WITH recent_activity AS (
   SELECT DISTINCT user_email
-  FROM `ai_usage_analytics.cursor_usage_stats`, params p
-  WHERE activity_date BETWEEN DATE_SUB(p.end_date, INTERVAL p.window_days DAY) AND p.end_date
+  FROM `ai_usage_analytics.cursor_usage_stats`
+  WHERE activity_date BETWEEN DATE_SUB(CAST({{end_date}} AS DATE), INTERVAL {{inactive_window_days}} DAY)
+    AND CAST({{end_date}} AS DATE)
+
   UNION DISTINCT
+
   SELECT DISTINCT user_email
-  FROM `ai_usage_analytics.claude_code_usage_stats`, params p
-  WHERE activity_date BETWEEN DATE_SUB(p.end_date, INTERVAL p.window_days DAY) AND p.end_date
+  FROM `ai_usage_analytics.claude_code_usage_stats`
+  WHERE activity_date BETWEEN DATE_SUB(CAST({{end_date}} AS DATE), INTERVAL {{inactive_window_days}} DAY)
+    AND CAST({{end_date}} AS DATE)
+
   UNION DISTINCT
+
   SELECT DISTINCT user_email
-  FROM `ai_usage_analytics.claude_ai_usage_stats`, params p
-  WHERE activity_date BETWEEN DATE_SUB(p.end_date, INTERVAL p.window_days DAY) AND p.end_date
+  FROM `ai_usage_analytics.claude_ai_usage_stats`
+  WHERE activity_date BETWEEN DATE_SUB(CAST({{end_date}} AS DATE), INTERVAL {{inactive_window_days}} DAY)
+    AND CAST({{end_date}} AS DATE)
 ),
 summary AS (
   SELECT
-    (SELECT total_seats FROM params) AS total_seats,
+    {{total_seats}} AS total_seats,
     COUNT(*) AS active_users
   FROM recent_activity
 )

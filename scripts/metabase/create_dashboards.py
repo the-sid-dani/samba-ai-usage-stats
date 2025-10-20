@@ -20,9 +20,10 @@ Usage examples:
   python scripts/metabase/create_dashboards.py \
     --sql-dir sql/dashboard/ai_cost \
     --dashboard-name "AI Cost Dashboard - Q4 2025" \
-    --param date_range \
+    --date start_date=2025-10-01 --date end_date=2025-12-31 \
     --number quarter_budget_usd=73000 --number daily_budget_usd=793.48 \
-    --number alert_threshold_usd=500 --number inactive_window_days=14 --number total_seats=250 \
+    --number alert_threshold_usd=500 --number user_budget_threshold_usd=500 \
+    --number inactive_window_days=14 --number total_seats=250 \
     --out dashboards.json
 """
 import argparse, json, os, sys, time, pathlib
@@ -73,6 +74,24 @@ def resolve_db_id(sess: requests.Session, host: str, name: Optional[str], dbid: 
     raise SystemExit("No BigQuery database found in Metabase")
 
 
+def resolve_field_id(sess: requests.Session, host: str, db_id: int, table_name: str, col_name: str) -> Optional[int]:
+    """Resolve BigQuery field ID from database metadata"""
+    r = sess.get(f"{host.rstrip('/')}/api/database/{db_id}/metadata")
+    r.raise_for_status()
+    metadata = r.json()
+
+    # Find the table
+    for table in metadata.get("tables", []):
+        if table_name.lower() in table.get("name", "").lower():
+            # Find the field
+            for field in table.get("fields", []):
+                if field.get("name") == col_name:
+                    return field["id"]
+
+    print(f"Warning: Could not resolve field ID for {table_name}.{col_name}")
+    return None
+
+
 def read_sql_files(sql_dir: str) -> List[Dict[str, str]]:
     files = sorted(pathlib.Path(sql_dir).glob("*.sql"))
     if not files:
@@ -89,14 +108,19 @@ def _build_template_tags(sql: str, param_index: Dict[str, Dict[str, Any]]) -> Tu
     for slug, meta in param_index.items():
         if f"{{{{{slug}" in sql:
             used.append(slug)
-            tags[slug] = {
+            tag_config = {
                 "id": meta["id"],
                 "name": slug,
                 "display-name": meta["name"],
                 "type": meta.get("type", "text"),
                 "widget-type": meta.get("_widget", meta.get("type", "text")),
                 "default": meta.get("default"),
+                "required": False,  # Make all parameters optional
             }
+            # Add dimension field mapping for Field Filter types
+            if meta.get("type") == "dimension":
+                tag_config["dimension"] = meta.get("dimension", ["field", meta.get("field_id")])
+            tags[slug] = tag_config
     return tags, used
 
 
@@ -183,6 +207,24 @@ def parse_number_kv(pairs: List[str]) -> List[Dict[str, Any]]:
     return out
 
 
+def parse_date_kv(pairs: List[str]) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for p in pairs:
+        if "=" not in p:
+            continue
+        k, v = p.split("=", 1)
+        slug = k.strip()
+        out.append({
+            "id": f"mb_param_{slug}",
+            "name": k,
+            "slug": slug,
+            "type": "date",
+            "default": v.strip(),
+            "_widget": "date/single",
+        })
+    return out
+
+
 def main():
     load_dotenv(dotenv_path=os.getenv("MB_ENV_FILE", "./.env"), override=False)
 
@@ -199,6 +241,7 @@ def main():
     parser.add_argument("--db-id", default=os.getenv("MB_DB_ID"))
     parser.add_argument("--db-name", default=os.getenv("MB_DB_NAME"))
     parser.add_argument("--param", action="append", default=[], help="Add a dashboard parameter by slug (e.g., date_range)")
+    parser.add_argument("--date", action="append", default=[], help="Date params as name=value (e.g., start_date=2025-10-01)")
     parser.add_argument("--number", action="append", default=[], help="number params as name=value (repeatable)")
     parser.add_argument("--out", default="dashboards.json")
     args = parser.parse_args()
@@ -214,6 +257,14 @@ def main():
 
     # Build dashboard parameters
     params: List[Dict[str, Any]] = []
+
+    # Add date parameters (simple date type, not Field Filters)
+    params.extend(parse_date_kv(args.date))
+
+    # Add number parameters
+    params.extend(parse_number_kv(args.number))
+
+    # Add regular params
     for p in args.param:
         slug = p.strip()
         if "date" in p:
@@ -234,7 +285,6 @@ def main():
                 "default": None,
                 "_widget": "text",
             })
-    params.extend(parse_number_kv(args.number))
 
     param_index = {p["slug"]: p for p in params}
 
