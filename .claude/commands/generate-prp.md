@@ -87,23 +87,23 @@ Using PRPs/templates/prp_base.md as template:
 - list tasks to be completed to fullfill the PRP in the order they should be completed
 - MAKE SURE TO CREATE A NEW PROJECT(IF NEEDED) AND ALL THE TASKS IN ARCHON AS WELL.
 
-### Validation Gates (Must be Executable - Better-Chatbot Specific)
+### Validation Gates (Must be Executable - Samba-AI-Usage-Stats Specific)
 
 ```bash
 # Project Health Check
-pnpm check-types           # TypeScript validation
-pnpm lint                  # Biome linting
-pnpm test                  # Vitest unit tests
+python -m pytest                    # Python unit tests
+python scripts/validation/run_validation.py  # Data validation
+bq query --use_legacy_sql=false "SELECT 1"  # BigQuery connection
 
 # Project-Specific Validation
-curl -f http://localhost:3000/api/health/langfuse  # Observability check
-pnpm build:local           # Vercel AI SDK build validation
-pnpm test:e2e             # Playwright integration tests (if applicable)
+python scripts/validation/run_data_validation.py  # Data integrity
+gcloud scheduler jobs list          # Cloud Scheduler validation
+gcloud run jobs list               # Cloud Run validation
 
-# Canvas/MCP specific (if relevant to feature)
-/validate-canvas          # Canvas system validation
-/validate-mcp            # MCP integration validation
-/validate-agents          # Agent system validation (if applicable)
+# BigQuery/Metabase specific (if relevant to feature)
+bq ls ai-workflows-459123:ai_usage  # Dataset validation
+bq query --dry_run --use_legacy_sql=false < sql_file.sql  # SQL validation
+python scripts/metabase/create_dashboards.py --dry-run  # Dashboard validation
 ```
 
 ***CRITICAL: Do extensive web research AND Serena MCP exploration before writing the PRP***
@@ -124,13 +124,13 @@ Save as: `PRPs/cc-prp-plans/prp-{feature-name}.md` (following naming conventions
 - [ ] Serena MCP server used extensively for codebase analysis
 - [ ] Official documentation thoroughly reviewed and URLs included
 - [ ] Real-world examples and patterns identified from web search
-- [ ] All necessary project context included (Vercel AI SDK, MCP, Canvas)
+- [ ] All necessary project context included (BigQuery, GCP, Python, Metabase)
 - [ ] Validation gates are executable and project-specific
 - [ ] References existing project patterns and conventions via Serena
 - [ ] Clear implementation path with step-by-step tasks
 - [ ] New project(if needed) and tasks created in Archon as well.
 - [ ] Error handling and edge cases documented
-- [ ] Integration points with Canvas/MCP/Observability identified (if relevant)
+- [ ] Integration points with BigQuery/GCP/Metabase identified (if relevant)
 - [ ] Code examples extracted from codebase using Serena tools
 
 Score the PRP on a scale of 1-10 (confidence level to succeed in one-pass implementation using claude codes)

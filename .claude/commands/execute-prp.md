@@ -1,33 +1,34 @@
 # Execute PRP Implementation
 
-Execute a comprehensive PRP (Project Requirements Plan) to implement features systematically using context engineering principles and Better-Chatbot architectural patterns. This command ensures robust implementation with comprehensive validation, error handling, and quality assurance.
+Execute a comprehensive PRP (Project Requirements Plan) to implement features systematically using context engineering principles and Samba-AI-Usage-Stats architectural patterns. This command ensures robust implementation with comprehensive validation, error handling, and quality assurance.
 
 ## PRP File: $ARGUMENTS
 
 ## Execution Process
 
-### 1. **Enhanced System Health Check** (Better-Chatbot Specific)
+### 1. **Enhanced System Health Check** (Samba-AI-Usage-Stats Specific)
 
    **Critical Infrastructure Validation:**
-   - **REQUIRED**: Langfuse observability: `curl -f http://localhost:3000/api/health/langfuse`
-   - **REQUIRED**: Port 3000 availability (Better-Chatbot localhost:3000 constraint)
-   - **Database**: PostgreSQL connection and schema validation
-   - **Build System**: Node.js and pnpm version compatibility
-   - **Development Environment**: Environment variables and dependencies
+   - **REQUIRED**: BigQuery connection: `bq query --use_legacy_sql=false "SELECT 1"`
+   - **REQUIRED**: GCP authentication: `gcloud auth application-default print-access-token`
+   - **Database**: BigQuery datasets and tables validation
+   - **Build System**: Python 3.11+ and pip version compatibility
+   - **Development Environment**: Environment variables and API keys
 
    **Context-Specific System Checks:**
-   - If Canvas work: `/validate-canvas` + verify chart tool registry
-   - If MCP work: `/validate-mcp` + test server connections and tool availability
-   - If Agent work: `/validate-agents` + check agent permissions and visibility
-   - If Authentication work: Test auth flows and session management
-   - If Workflow work: Verify workflow engine and XYFlow integration
+   - If BigQuery work: `bq ls ai-workflows-459123:ai_usage` + verify view definitions
+   - If Metabase work: Test dashboard API connection and card creation
+   - If API work: Verify Claude Admin API and Cursor API access
+   - If Pipeline work: Test Cloud Scheduler and Cloud Run jobs
+   - If Validation work: Run data integrity checks
 
    **Pre-Implementation Validation:**
    ```bash
    # Core system validation
-   pnpm check-types --noEmit
-   pnpm lint --max-warnings 0
-   node -v && pnpm -v
+   python --version
+   python -m pytest --version
+   bq version
+   gcloud version
    ```
 
 ### 2. **Comprehensive PRP Analysis & Context Loading**
@@ -36,7 +37,7 @@ Execute a comprehensive PRP (Project Requirements Plan) to implement features sy
    - Read PRP file: `$ARGUMENTS`
    - Validate PRP completeness and structure
    - Extract implementation requirements and success criteria
-   - Identify Better-Chatbot specific integration points
+   - Identify project-specific integration points
    - Map to existing architectural patterns
 
    **Deep Context Research:**
@@ -48,11 +49,11 @@ Execute a comprehensive PRP (Project Requirements Plan) to implement features sy
    - Ensure comprehensive understanding before implementation
 
    **Architecture Pattern Identification:**
-   - Verify Vercel AI SDK integration patterns
-   - Check Canvas system integration requirements
-   - Identify MCP tool conversion needs
-   - Review observability integration points
-   - Map database schema requirements
+   - Verify BigQuery view and stored procedure patterns
+   - Check Python script integration requirements
+   - Identify GCP service integration needs
+   - Review Metabase dashboard patterns
+   - Map data validation requirements
 
 ### 3. **ULTRATHINK - Comprehensive Implementation Planning**
 
@@ -60,106 +61,105 @@ Execute a comprehensive PRP (Project Requirements Plan) to implement features sy
    - Create comprehensive plan addressing ALL PRP requirements
    - Break down complex tasks into atomic, manageable steps
    - **MANDATORY**: Use TodoWrite tool for implementation tracking
-   - Identify implementation patterns from existing Better-Chatbot code
+   - Identify implementation patterns from existing project code
    - Plan validation strategy and testing approach
    - Consider performance, security, and maintainability impacts
 
    **Risk Assessment:**
    - Identify potential breaking changes and mitigation strategies
    - Plan backward compatibility considerations
-   - Assess impact on Canvas, MCP, and Agent systems
-   - Consider observability and monitoring implications
+   - Assess impact on BigQuery views and dashboards
+   - Consider data integrity and validation implications
    - Plan rollback scenarios if needed
 
 ### 4. **Systematic Implementation**
 
    **Code Implementation Phase:**
    - Execute the PRP systematically following the planned approach
-   - Implement all code changes following Better-Chatbot patterns
-   - Use established Vercel AI SDK patterns for AI operations
-   - Follow Canvas integration patterns for visualization tools
-   - Implement proper MCP tool conversion if needed
-   - Ensure Langfuse observability integration
+   - Implement all code changes following Python/BigQuery patterns
+   - Use established Python script patterns for data pipelines
+   - Follow BigQuery SQL patterns for analytics queries
+   - Implement proper GCP service integration if needed
+   - Ensure data validation and quality checks
 
    **Implementation Standards:**
-   - Follow TypeScript strict mode and Better-Chatbot code style
-   - Use Biome formatting and linting standards
+   - Follow Python PEP 8 style guide and project conventions
+   - Use consistent SQL formatting for BigQuery queries
    - Implement proper error handling and edge cases
-   - Add comprehensive logging and observability
-   - Follow security best practices
+   - Add comprehensive logging and monitoring
+   - Follow GCP security best practices
 
 ### 5. **Multi-Layer Validation Framework**
 
    **Structure Validation:**
    ```bash
    # Verify file structure and imports
-   find src -name "*.ts" -o -name "*.tsx" | head -20 | xargs ls -la
-   grep -r "import.*from" src/lib/ai/ | head -10
+   find scripts -name "*.py" | head -20 | xargs ls -la
+   find sql -name "*.sql" | head -10 | xargs ls -la
    ```
 
    **Content Validation:**
    ```bash
    # Check for incomplete implementations
-   grep -r "TODO\|PLACEHOLDER\|FIXME" src/ || echo "✅ No incomplete markers"
-   grep -r "console.log\|console.error" src/ && echo "⚠️ Remove debug logs" || echo "✅ Clean logging"
+   grep -r "TODO\|PLACEHOLDER\|FIXME" scripts/ sql/ || echo "✅ No incomplete markers"
+   grep -r "print(" scripts/ && echo "⚠️ Remove debug prints" || echo "✅ Clean logging"
    ```
 
    **Functionality Validation:**
    ```bash
    # Core system checks
-   pnpm check-types
-   pnpm lint
-   pnpm test
-   pnpm build:local
+   python -m pytest
+   python scripts/validation/run_validation.py
+   bq query --dry_run --use_legacy_sql=false < sql/views/latest_view.sql
    ```
 
-   **Better-Chatbot Specific Validation:**
+   **Samba-AI-Usage-Stats Specific Validation:**
    ```bash
-   # Canvas integration check (if applicable)
-   grep -r "shouldCreateArtifact" src/lib/ai/tools/artifacts/ || echo "Canvas integration verification"
+   # BigQuery dataset check
+   bq ls ai-workflows-459123:ai_usage || echo "Dataset verification"
 
-   # MCP integration check (if applicable)
-   grep -r "createTool" src/lib/ai/mcp/ || echo "MCP tool conversion verification"
+   # API integration check (if applicable)
+   python scripts/api_investigation/test_claude_admin_api.py --dry-run || echo "API verification"
 
-   # Observability check
-   curl -f http://localhost:3000/api/health/langfuse
+   # Data validation check
+   python scripts/validation/run_data_validation.py
 
-   # Agent system check (if applicable)
-   grep -r "allowedMcpServers" src/app/api/chat/ || echo "Agent tool configuration verification"
+   # Metabase dashboard check (if applicable)
+   python scripts/metabase/create_dashboards.py --dry-run || echo "Dashboard verification"
    ```
 
 ### 6. **Quality Assurance Process**
 
    **Code Quality Verification:**
-   - [ ] Follows Vercel AI SDK patterns for all AI operations
-   - [ ] Uses established Canvas integration patterns (if applicable)
-   - [ ] Implements proper MCP tool conversion (if applicable)
+   - [ ] Follows Python best practices and PEP 8 standards
+   - [ ] Uses established BigQuery SQL patterns (if applicable)
+   - [ ] Implements proper GCP service integration (if applicable)
    - [ ] Includes comprehensive error handling and edge cases
-   - [ ] Maintains Better-Chatbot architectural conventions
-   - [ ] Implements proper observability integration
+   - [ ] Maintains project architectural conventions
+   - [ ] Implements proper data validation and quality checks
 
    **Integration Testing:**
    - [ ] Manual testing of all implemented features
-   - [ ] Cross-system integration testing (Canvas, MCP, Agents)
-   - [ ] Performance impact assessment
+   - [ ] Cross-system integration testing (BigQuery, GCP, Metabase)
+   - [ ] Performance impact assessment on BigQuery queries
    - [ ] Security considerations reviewed and implemented
-   - [ ] Mobile responsiveness verified (if UI changes)
+   - [ ] Data integrity verified across pipelines
 
    **System Compatibility:**
    - [ ] No breaking changes to existing functionality
    - [ ] Backward compatibility maintained where possible
-   - [ ] Database migrations properly implemented (if needed)
+   - [ ] BigQuery schema changes properly implemented (if needed)
    - [ ] Environment configuration updated (if needed)
 
 ### 7. **Documentation and Knowledge Management**
 
    **Required Documentation Updates:**
    - [ ] Update relevant CLAUDE.md sections if architectural patterns change
-   - [ ] Update component documentation and code comments
-   - [ ] Add/update API documentation for new endpoints
+   - [ ] Update script documentation and code comments
+   - [ ] Add/update API documentation for new data pipelines
    - [ ] Update .claude/commands if new patterns emerge
-   - [ ] Document new MCP integrations in appropriate locations
-   - [ ] Update Canvas system documentation if chart tools added
+   - [ ] Document new BigQuery views and procedures
+   - [ ] Update Metabase dashboard documentation if modified
    - [ ] Create/update PRP documentation for future reference
 
    **Knowledge Preservation:**
@@ -187,17 +187,17 @@ Execute a comprehensive PRP (Project Requirements Plan) to implement features sy
 The implementation is complete when ALL of the following criteria are met:
 
 - [ ] **PRP Requirements**: All requirements from the PRP document are fully implemented
-- [ ] **Code Quality**: TypeScript compilation passes with zero errors
-- [ ] **Testing**: All unit tests pass without failures
-- [ ] **Linting**: Code passes all linting checks with zero warnings
-- [ ] **Build**: Production build completes successfully
-- [ ] **System Health**: All Better-Chatbot health checks pass
-- [ ] **Observability**: Langfuse integration working and traces visible
-- [ ] **Canvas Integration**: Chart tools and Canvas functionality work (if applicable)
-- [ ] **MCP Integration**: MCP servers and tools accessible (if applicable)
-- [ ] **Agent System**: Agent permissions and visibility correct (if applicable)
-- [ ] **Performance**: No significant performance degradation introduced
-- [ ] **Security**: Security best practices followed and no vulnerabilities introduced
+- [ ] **Code Quality**: Python code passes all PEP 8 checks and tests
+- [ ] **Testing**: All pytest unit tests pass without failures
+- [ ] **SQL Validation**: BigQuery SQL queries pass dry-run validation
+- [ ] **Build**: Docker build completes successfully (if applicable)
+- [ ] **System Health**: All GCP and BigQuery health checks pass
+- [ ] **Data Integrity**: Data validation scripts pass all checks
+- [ ] **API Integration**: Claude Admin and Cursor APIs accessible (if applicable)
+- [ ] **Metabase Integration**: Dashboard cards and visualizations work (if applicable)
+- [ ] **GCP Services**: Cloud Functions/Run/Scheduler configured correctly (if applicable)
+- [ ] **Performance**: BigQuery query performance meets requirements
+- [ ] **Security**: GCP security best practices followed and API keys secured
 - [ ] **Documentation**: All relevant documentation updated and accurate
 - [ ] **Backward Compatibility**: No breaking changes to existing functionality
 - [ ] **Manual Testing**: End-to-end manual testing passes
@@ -209,7 +209,7 @@ The implementation is complete when ALL of the following criteria are met:
 
 **When Validation Fails:**
 1. **Error Analysis**: Identify root cause from logs, output, and error messages
-2. **Pattern Recognition**: Match error to common Better-Chatbot patterns
+2. **Pattern Recognition**: Match error to common project patterns
 3. **Targeted Fix**: Address specific issue without affecting working components
 4. **Incremental Validation**: Test fix in isolation before full validation
 5. **Re-validation**: Run complete validation suite
@@ -217,35 +217,35 @@ The implementation is complete when ALL of the following criteria are met:
 
 ### Common Error Patterns & Solutions
 
-**TypeScript Compilation Errors:**
-- Check import statements and module resolution
-- Verify type definitions and interface compatibility
-- Check Vercel AI SDK type usage patterns
-- Review Canvas and MCP type integrations
+**Python Execution Errors:**
+- Check import statements and module dependencies
+- Verify Python version compatibility
+- Check API client initialization patterns
+- Review data type handling and conversions
 
-**Build Failures:**
-- Verify all dependencies are installed and compatible
-- Check environment variable requirements
-- Review Next.js configuration changes
-- Validate public asset requirements (especially for Canvas geographic data)
+**BigQuery Failures:**
+- Verify dataset and table permissions
+- Check SQL syntax and BigQuery-specific functions
+- Review view dependencies and references
+- Validate schema compatibility
 
 **Test Failures:**
 - Update test cases to match new implementation
-- Mock new dependencies appropriately
-- Check test environment setup and data
-- Verify async/await patterns in tests
+- Mock API responses appropriately
+- Check test data fixtures
+- Verify async patterns in data pipelines
 
-**Better-Chatbot Specific Issues:**
-- **Canvas Problems**: Check artifact tool registration and chart component integration
-- **MCP Issues**: Verify server connections, tool conversion, and availability
-- **Agent Problems**: Check tool loading pipeline and permission configurations
-- **Observability Issues**: Verify Langfuse configuration and instrumentation setup
+**Samba-AI-Usage-Stats Specific Issues:**
+- **API Problems**: Check API keys in Secret Manager and authentication
+- **GCP Issues**: Verify service account permissions and project access
+- **Pipeline Problems**: Check Cloud Scheduler cron expressions and job configurations
+- **Data Issues**: Verify data validation rules and integrity checks
 
 **Performance Issues:**
-- Check for memory leaks in Canvas state management
-- Review database query efficiency
-- Validate proper cleanup in React components
-- Monitor bundle size impact
+- Check BigQuery query complexity and partitioning
+- Review Python script memory usage
+- Validate batch processing sizes
+- Monitor API rate limits
 
 ### Escalation Process
 
@@ -261,41 +261,41 @@ The implementation is complete when ALL of the following criteria are met:
 ### Core System Validation
 ```bash
 # Essential checks that must always pass
-pnpm check-types                    # TypeScript validation
-pnpm lint                          # Code quality and style
-pnpm test                          # Unit test suite
-pnpm build:local                   # Production build test
+python -m pytest                    # Python unit tests
+python -m pylint scripts/           # Code quality and style
+bq query --dry_run --use_legacy_sql=false < query.sql  # SQL validation
+docker build -t test-build .       # Container build test (if applicable)
 ```
 
-### Better-Chatbot Health Checks
+### Samba-AI-Usage-Stats Health Checks
 ```bash
 # System health validation
-curl -f http://localhost:3000/api/health/langfuse  # Observability check
-lsof -i :3000                     # Port availability check
-node -v && pnpm -v                # Version compatibility check
+bq query --use_legacy_sql=false "SELECT 1"  # BigQuery connection
+gcloud auth application-default print-access-token  # GCP auth check
+python --version && pip --version  # Version compatibility check
 ```
 
 ### Feature-Specific Validation
 ```bash
-# Canvas system (if applicable)
-find src/lib/ai/tools/artifacts -name "*-tool.ts" | wc -l  # Chart tools count
-grep -r "shouldCreateArtifact" src/lib/ai/tools/artifacts/ # Canvas integration
+# BigQuery system (if applicable)
+bq ls ai-workflows-459123:ai_usage | head -5  # Dataset tables
+bq show ai-workflows-459123:ai_usage.view_name  # View definition
 
-# MCP system (if applicable)
-find src/lib/ai/mcp -name "*.ts" | head -5 # MCP integration files
-grep -r "mcpClientsManager" src/lib/ai/ # MCP manager usage
+# API integration (if applicable)
+python scripts/api_investigation/test_claude_admin_api.py --dry-run
+python scripts/api_investigation/test_cursor_admin_api.py --dry-run
 
-# Agent system (if applicable)
-grep -r "allowedMcpServers" src/app/api/chat/ # Agent tool configuration
-grep -r "AgentSchema" src/lib/db/ # Agent database integration
+# Metabase system (if applicable)
+python scripts/metabase/create_dashboards.py --list  # Dashboard verification
+python scripts/metabase/create_single_card.py --dry-run  # Card creation test
 ```
 
 ## Reference Notes
 
 **PRP Re-Reference**: Always available to reference the original PRP document at any stage if clarification is needed on requirements, context, or success criteria.
 
-**Architecture Patterns**: Leverage existing Better-Chatbot patterns for Vercel AI SDK integration, Canvas system usage, MCP tool conversion, and observability implementation.
+**Architecture Patterns**: Leverage existing Python script patterns for data pipelines, BigQuery SQL patterns for analytics, GCP service integration, and Metabase dashboard creation.
 
-**System Constraints**: Remember Better-Chatbot's localhost:3000 requirement and specific integration patterns for Canvas, MCP, and Agent systems.
+**System Constraints**: Remember GCP project ID (ai-workflows-459123), BigQuery dataset requirements, and specific integration patterns for Claude Admin API and Cursor API.
 
-**Quality Standards**: Maintain high code quality standards with comprehensive testing, proper error handling, and full observability integration throughout the implementation process.
+**Quality Standards**: Maintain high code quality standards with comprehensive testing, proper error handling, and full data validation throughout the implementation process.

@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+PRPs/
+*.md
+README.md
+
+# Tests
+tests/
+.pytest_cache/
+
+# Logs
+*.log
+/tmp/
+
+# Mac
+.DS_Store
+
+# Other
+sql/
+infrastructure/
+.claude/
