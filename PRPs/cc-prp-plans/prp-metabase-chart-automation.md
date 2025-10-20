@@ -8,6 +8,42 @@
 
 ---
 
+## 🔖 Quick Reference
+
+**Archon Project ID:**
+```
+a3404ec0-5492-494f-9685-7a726a31f41e
+```
+
+**Task IDs (Execute in Order):**
+```
+1. 68329a02-a4f9-43b7-8314-d520deeb4f58  # create_dimension_parameter()
+2. 3706096e-87cd-4f86-afed-162a3c229539  # display_type + viz_settings
+3. 23cbf60b-9b1a-4690-b614-b9e51566aea9  # _build_template_tags() fix
+4. 8d04b27b-fd9a-4466-b201-88fc0f5e8638  # CLI arguments
+5. aedb70ba-7f26-4ac6-9df0-2676c8f5f86e  # chart_templates.py
+6. e5daf4ef-8ef0-4b37-bad2-b17572468644  # filter_templates.py
+7. 545e73e7-3965-48d8-915e-ed82bb6b2010  # config_loader.py
+8. 95078079-85c5-4a9b-8503-31bdaa2201f3  # SQL migration
+9. 4b8a0e9c-0ad0-44e5-a8dd-a2818bfab3f1  # chart_config.json
+10. 5bbc1f1a-7976-4d27-8270-995955ce9d85 # test suite
+11. daddc260-a8d4-4ea2-8f83-2d466d7e6ebb # Claude guide
+```
+
+**Quick Commands:**
+```python
+# View project
+mcp__archon__find_projects(project_id="a3404ec0-5492-494f-9685-7a726a31f41e")
+
+# List all tasks
+mcp__archon__find_tasks(project_id="a3404ec0-5492-494f-9685-7a726a31f41e")
+
+# Start first task
+mcp__archon__manage_task("update", task_id="68329a02-a4f9-43b7-8314-d520deeb4f58", status="doing")
+```
+
+---
+
 ## 📋 Context & Problem Statement
 
 ### Current State (LIMITED)
@@ -1918,30 +1954,121 @@ done
 
 ## 🎯 Archon Task Tracking
 
-**Archon Project Created:**
+**Archon Project:**
 - **Project ID**: `a3404ec0-5492-494f-9685-7a726a31f41e`
 - **Project Name**: Metabase Chart & Filter Automation
+- **GitHub Repo**: https://github.com/the-sid-dani/samba-ai-usage-stats
 
-**Tasks Created (10 total):**
-1. Add create_dimension_parameter() function
-2. Add display_type and viz_settings to create_card()
-3. Fix _build_template_tags() for dimension parameters
-4. Add --field-filter and --chart-config CLI arguments
-5. Create chart_templates.py with 13 chart types
-6. Create filter_templates.py with 9 filter types
-7. Create config_loader.py
-8. Update 5 SQL files to field filter syntax
-9. Create chart_config.json for all 14 SQL files
-10. Create comprehensive test suite
-11. Create Claude usage guide
+### Implementation Tasks (11 total)
 
-**Track Progress:**
-```bash
-# List all tasks
+**Execute in this order (by priority):**
+
+**Phase 1: Core Field Filter & Chart Support**
+
+1. **Add create_dimension_parameter() function** (HIGHEST PRIORITY)
+   - **Task ID**: `68329a02-a4f9-43b7-8314-d520deeb4f58`
+   - **Feature**: core-implementation
+   - **Task Order**: 110
+   - **Description**: Create field filter parameters with dropdown/search capabilities
+
+2. **Add display_type and viz_settings to create_card()**
+   - **Task ID**: `3706096e-87cd-4f86-afed-162a3c229539`
+   - **Feature**: core-implementation
+   - **Task Order**: 104
+   - **Description**: Enable chart type specification and visualization settings
+
+3. **Fix _build_template_tags() for dimension parameters**
+   - **Task ID**: `23cbf60b-9b1a-4690-b614-b9e51566aea9`
+   - **Feature**: core-implementation
+   - **Task Order**: 98
+   - **Description**: Handle field filter template tags with dimension type
+
+4. **Add --field-filter and --chart-config CLI arguments**
+   - **Task ID**: `8d04b27b-fd9a-4466-b201-88fc0f5e8638`
+   - **Feature**: core-implementation
+   - **Task Order**: 92
+   - **Description**: CLI interface for field filters and chart configurations
+
+**Phase 2: Configuration System**
+
+5. **Create chart_templates.py**
+   - **Task ID**: `aedb70ba-7f26-4ac6-9df0-2676c8f5f86e`
+   - **Feature**: configuration-system
+   - **Task Order**: 86
+   - **Description**: Define visualization_settings templates for all 13 chart types
+
+6. **Create filter_templates.py**
+   - **Task ID**: `e5daf4ef-8ef0-4b37-bad2-b17572468644`
+   - **Feature**: configuration-system
+   - **Task Order**: 80
+   - **Description**: Define field filter configurations for all 9 filter types
+
+7. **Create config_loader.py**
+   - **Task ID**: `545e73e7-3965-48d8-915e-ed82bb6b2010`
+   - **Feature**: configuration-system
+   - **Task Order**: 74
+   - **Description**: Configuration loading, validation, and merging
+
+**Phase 3: SQL Migration & Configuration**
+
+8. **Update SQL files to field filter syntax**
+   - **Task ID**: `95078079-85c5-4a9b-8503-31bdaa2201f3`
+   - **Feature**: sql-migration
+   - **Task Order**: 68
+   - **Description**: Update 5 SQL files to use WHERE {{filter}} syntax
+
+9. **Create chart_config.json for all 14 SQL files**
+   - **Task ID**: `4b8a0e9c-0ad0-44e5-a8dd-a2818bfab3f1`
+   - **Feature**: configuration-system
+   - **Task Order**: 62
+   - **Description**: Map each SQL file to appropriate chart type
+
+**Phase 4: Testing & Documentation**
+
+10. **Create comprehensive test suite**
+    - **Task ID**: `5bbc1f1a-7976-4d27-8270-995955ce9d85`
+    - **Feature**: testing
+    - **Task Order**: 56
+    - **Description**: Unit and integration tests for all components
+
+11. **Create Claude usage guide**
+    - **Task ID**: `daddc260-a8d4-4ea2-8f83-2d466d7e6ebb`
+    - **Feature**: documentation
+    - **Task Order**: 50
+    - **Description**: Complete guide with 20+ example conversations
+
+### Quick Task Management Commands
+
+**View All Tasks:**
+```python
 mcp__archon__find_tasks(project_id="a3404ec0-5492-494f-9685-7a726a31f41e")
+```
 
-# Update task status
-mcp__archon__manage_task("update", task_id="...", status="doing")
+**Start Task 1 (create_dimension_parameter):**
+```python
+mcp__archon__manage_task(
+    "update",
+    task_id="68329a02-a4f9-43b7-8314-d520deeb4f58",
+    status="doing"
+)
+```
+
+**Complete Task 1:**
+```python
+mcp__archon__manage_task(
+    "update",
+    task_id="68329a02-a4f9-43b7-8314-d520deeb4f58",
+    status="done"
+)
+```
+
+**Start Next Task (display_type/viz_settings):**
+```python
+mcp__archon__manage_task(
+    "update",
+    task_id="3706096e-87cd-4f86-afed-162a3c229539",
+    status="doing"
+)
 ```
 
 ---
@@ -2572,6 +2699,27 @@ WHERE {{provider}}
 
 **END OF PRP**
 
-**Next Step:** Begin implementation with Task 1 (Field Filter Support)
-**Archon Project ID:** `a3404ec0-5492-494f-9685-7a726a31f41e`
+---
+
+## 📌 Implementation Quick Start
+
+**Next Step:** Begin implementation with Task 1
+
+**Archon Project:**
+- Project ID: `a3404ec0-5492-494f-9685-7a726a31f41e`
+- First Task ID: `68329a02-a4f9-43b7-8314-d520deeb4f58`
+
 **Implementation Branch:** `feature/metabase-chart-automation` (recommended)
+
+**Start Implementation:**
+```bash
+# Create feature branch
+git checkout -b feature/metabase-chart-automation
+
+# Start Task 1 in Archon
+mcp__archon__manage_task("update", task_id="68329a02-a4f9-43b7-8314-d520deeb4f58", status="doing")
+
+# Begin coding (see Task 1 in Implementation Tasks section)
+```
+
+**All Task IDs Listed in "Quick Reference" section at top of document for easy copy-paste.**
